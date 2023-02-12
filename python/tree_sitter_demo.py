@@ -19,11 +19,15 @@ def main():
     parser = Parser()
     parser.set_language(PY_LANGUAGE)
 
+    # tree = parser.parse(bytes("""
+    # def foo():
+    #     if bar:
+    #         baz()
+    # """, "utf8"))
+
     tree = parser.parse(bytes("""
-    def foo():
-        if bar:
-            baz()
-    """, "utf8"))
+        1+2
+        """, "utf8"))
 
     root_node = tree.root_node
     print(root_node.sexp())
