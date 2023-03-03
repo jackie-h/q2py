@@ -24,7 +24,9 @@ def convert_number(node: Node, tail, out: deque):
 
 
 def convert_string(node: Node, tail, out: deque):
-    out.append(Constant(node.text.decode('utf-8')))
+    str_val_with_quotes:str = node.text.decode('utf-8')
+    str_val = str_val_with_quotes.removesuffix("\"").removeprefix("\"")
+    out.append(Constant(str_val))
 
 
 def convert_operator(node: Node, tail, out: deque):
@@ -42,10 +44,8 @@ def convert_local_var(node: Node, tail, out: deque):
     transpile(node.children[2], tail, out)
     value = out.pop()
     if node.children[2].type == "function_body":
-        func = FunctionDef(var_name, [], body=[value],
-                           decorator_list=[],lineno=0)
+        func = FunctionDef(var_name, [], body=[value],decorator_list=[],lineno=0)
         out.append(func)
-    print(node)
 
 
 def convert_function_call(node: Node, tail, out: deque):
@@ -109,8 +109,6 @@ def transpile(node: Node, tail, out: deque):
         convert_table(node, tail, out)
     elif node.type == ";":
         None
-    elif node.type == ":":
-        None
     else:
         raise NotImplementedError
     return out
@@ -136,7 +134,7 @@ def main():
 
     tree = parser.parse(bytes("""
     .test.test_add:{
-      AEQ[3;1+2;""]
+      AEQ[3;1+2;"1+2 should equal 3"]
     };
         """, "utf8"))
 
