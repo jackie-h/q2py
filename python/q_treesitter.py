@@ -1,30 +1,41 @@
-from tree_sitter import Language, Parser
+from _ast import Add, BinOp, Constant
+from ast import unparse
+
+from tree_sitter import Language, Parser, Node
+from collections import deque
 
 
-def convert_expr_list(node, out):
-    for child in node.children:
-        out.append(transpile(child, out))
+def convert_expr_list(node: Node, tail, out: deque):
+    l = list(node.children)
+    while len(l) > 0:
+        node = l.pop()
+        transpile(node, l, out)
 
 
-def convert_number(node, out):
-    print(node)
+def convert_number(node: Node, tail, out: deque):
+    out.append(Constant(float(node.text.decode('utf-8'))))
 
 
-def convert_operator(node, out):
-    print(node)
+def convert_operator(node: Node, tail, out: deque):
+    lhs = out.pop()
+    transpile(tail.pop(), tail, out)
+    rhs = out.pop()
+    if node.text == b'+':
+        op = BinOp(lhs, Add(), rhs)
+        out.append(op)
 
 
-def transpile(node, out):
+def  transpile(node: Node, tail, out: deque):
     print(node.type)
     if node.type == "source_file":
         for child in node.children:
-            transpile(child, out)
+            transpile(child, [], out)
     elif node.type == "expr_list":
-        convert_expr_list(node, out)
+        convert_expr_list(node, tail, out)
     elif node.type == "number":
-        convert_number(node,out)
+        convert_number(node, [], out)
     elif node.type == "operator":
-        convert_operator(node,out)
+        convert_operator(node, tail, out)
     else:
         raise NotImplementedError
     return out
@@ -54,7 +65,9 @@ def main():
 
     root_node = tree.root_node
     print(root_node.sexp())
-    transpile(root_node, [])
+    out = deque()
+    transpile(root_node, [], out)
+    print(unparse(out.pop()))
 
 
 if __name__ == "__main__":
