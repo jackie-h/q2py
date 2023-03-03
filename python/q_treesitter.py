@@ -51,30 +51,36 @@ def convert_local_var(node: Node, tail, out: deque):
 def convert_function_call(node: Node, tail, out: deque):
     assert node.child_count == 2
     lhs = node.children[0].text.decode('utf-8')
-    transpile(node.children[1], tail, out)
+    args_node = node.children[1]
+    transpile(args_node, tail, out)
     args = []
-    for _ in range(node.child_count):
+    for _ in range(args_node.child_count):
         args.append(out.pop())
     call = Call(Name(lhs),args,[])
     out.append(call)
 
+
 def convert_function_body(node: Node, tail, out: deque):
     assert node.child_count == 3
     transpile(node.children[1], tail, out)
-    print(node)
+
+
 def convert_namespace(node: Node, tail, out: deque):
     assert node.child_count == 2
     convert_string(node.children[1], tail, out)
+
 
 def convert_entity_name(node: Node, tail, out: deque):
     assert node.child_count == 0
     convert_string(node, tail, out)
 
+
 def convert_table(node: Node, tail, out: deque):
     assert node.child_count == 3
     transpile(node.children[1], tail, out)
 
-def  transpile(node: Node, tail, out: deque):
+
+def transpile(node: Node, tail, out: deque):
     print(node.type)
     if node.type == "source_file":
         for child in node.children:
