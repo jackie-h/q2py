@@ -53,7 +53,7 @@ def convert_function_call(node: Node, tail, out: deque):
     lhs = node.children[0].text.decode('utf-8')
     transpile(node.children[1], tail, out)
     args = []
-    while len(out) > 0:
+    for _ in range(node.child_count):
         args.append(out.pop())
     call = Call(Name(lhs),args,[])
     out.append(call)
