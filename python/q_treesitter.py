@@ -1,4 +1,4 @@
-from _ast import Add, BinOp, Constant, FunctionDef
+from _ast import Add, BinOp, Constant, FunctionDef, Call, Name
 from ast import unparse
 
 from tree_sitter import Language, Parser, Node
@@ -18,11 +18,14 @@ def convert_expr_seq(node: Node, tail, out: deque):
         node = l.pop()
         transpile(node, l, out)
 
+
 def convert_number(node: Node, tail, out: deque):
     out.append(Constant(float(node.text.decode('utf-8'))))
 
+
 def convert_string(node: Node, tail, out: deque):
     out.append(Constant(node.text.decode('utf-8')))
+
 
 def convert_operator(node: Node, tail, out: deque):
     lhs = out.pop()
@@ -44,6 +47,16 @@ def convert_local_var(node: Node, tail, out: deque):
         out.append(func)
     print(node)
 
+
+def convert_function_call(node: Node, tail, out: deque):
+    assert node.child_count == 2
+    lhs = node.children[0].text.decode('utf-8')
+    transpile(node.children[1], tail, out)
+    args = []
+    while len(out) > 0:
+        args.append(out.pop())
+    call = Call(Name(lhs),args,[])
+    out.append(call)
 
 def convert_function_body(node: Node, tail, out: deque):
     assert node.child_count == 3
@@ -80,6 +93,8 @@ def  transpile(node: Node, tail, out: deque):
         convert_local_var(node, tail, out)
     elif node.type == "function_body":
         convert_function_body(node, tail, out)
+    elif node.type == "function_call":
+        convert_function_call(node, tail, out)
     elif node.type == "namespace":
         convert_namespace(node, tail, out)
     elif node.type == "entity_name":
