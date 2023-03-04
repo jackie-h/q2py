@@ -149,7 +149,7 @@ def get_parser() -> Parser:
     return parser
 
 
-def parse_and_transpile(parser:Parser, text:str, module_name:str):
+def parse_and_transpile(parser:Parser, text:str, module_name:str) -> Module:
     tree = parser.parse(bytes(text, "utf8"))
     root_node = tree.root_node
     print(root_node.sexp())
@@ -172,27 +172,31 @@ def parse_and_transpile(parser:Parser, text:str, module_name:str):
         import_st = ast.parse('import unittest')
         main = ast.parse('if __name__ == \'__main__\':unittest.main()')
         mod = Module([import_st, test_class, main], [])
-        print(unparse(mod))
+        return mod
     else:
-        print(unparse(out.pop()))
+        mod = Module([out.pop()],[])
+        return mod
 
 
-def parse_and_transpile_file(parser, file_name):
+def parse_and_transpile_file(parser, file_name) -> Module:
     f = open(file_name, "r")
     path:Path = Path(file_name)
-    parse_and_transpile(parser, f.read(), path.stem)
+    return parse_and_transpile(parser, f.read(), path.stem)
 
 def main():
     print("Hello Q!")
 
     parser:Parser = get_parser()
-    parse_and_transpile(parser, "1+2", "example")
-    parse_and_transpile(parser,"""
+    mod = parse_and_transpile(parser, "1+2", "example")
+    print(unparse(mod))
+    mod = parse_and_transpile(parser,"""
         .test.test_add:{
           AEQ[3;1+2;"1+2 should equal 3"]
         };
             """, "example")
-    parse_and_transpile_file(parser, "../q/testExample.q")
+    print(unparse(mod))
+    mod = parse_and_transpile_file(parser, "../q/testExample.q")
+    print(unparse(mod))
 
 
 if __name__ == "__main__":
