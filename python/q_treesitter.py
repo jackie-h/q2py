@@ -22,8 +22,8 @@ def convert_expr_seq(node: Node, tail, out: deque, named: dict):
         transpile(node, l, out, named)
 
 
-def convert_number(node: Node, tail, out: deque):
-    out.append(Constant(float(node.text.decode('utf-8'))))
+def convert_long(node: Node, tail, out: deque):
+    out.append(Constant(int(node.text.decode('utf-8'))))
 
 
 def convert_string(node: Node, tail, out: deque):
@@ -104,8 +104,8 @@ def transpile(node: Node, tail, out: deque, named: dict):
         convert_expr_list(node, tail, out, named)
     elif node.type == "expr_seq":
         convert_expr_seq(node, tail, out, named)
-    elif node.type == "number":
-        convert_number(node, [], out)
+    elif node.type == "long":
+        convert_long(node, [], out)
     elif node.type == "string":
         convert_string(node, [], out)
     elif node.type == "operator":
@@ -127,7 +127,7 @@ def transpile(node: Node, tail, out: deque, named: dict):
     elif node.type == ".":
         None
     else:
-        raise NotImplementedError
+        raise NotImplementedError(node.type)
     return out
 
 
