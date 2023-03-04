@@ -24,7 +24,7 @@ def convert_number(node: Node, tail, out: deque):
 
 
 def convert_string(node: Node, tail, out: deque):
-    str_val_with_quotes:str = node.text.decode('utf-8')
+    str_val_with_quotes: str = node.text.decode('utf-8')
     str_val = str_val_with_quotes.removesuffix("\"").removeprefix("\"")
     out.append(Constant(str_val))
 
@@ -54,7 +54,7 @@ def convert_local_var(node: Node, tail, out: deque, named: dict):
     transpile(node.children[2], tail, out, named)
     value = out.pop()
     if node.children[2].type == "function_body":
-        func = FunctionDef(var_name.id, [], body=[value],decorator_list=[],lineno=0)
+        func = FunctionDef(var_name.id, [], body=[value], decorator_list=[], lineno=0)
         out.append(func)
         parent[var_name.id] = func
 
@@ -67,7 +67,7 @@ def convert_function_call(node: Node, tail, out: deque, named: dict):
     args = []
     for _ in range(args_node.child_count):
         args.append(out.pop())
-    call = Call(Name(lhs),args,[])
+    call = Call(Name(lhs), args, [])
     out.append(call)
 
 
@@ -128,9 +128,7 @@ def transpile(node: Node, tail, out: deque, named: dict):
     return out
 
 
-def main():
-    print("Hello World!")
-
+def get_parser() -> Parser:
     Language.build_library(
         # Store the library in the `build` directory
         'build/my-languages.so',
@@ -145,19 +143,28 @@ def main():
 
     parser = Parser()
     parser.set_language(Q_LANGUAGE)
+    return parser
 
-    tree = parser.parse(bytes("""
-    .test.test_add:{
-      AEQ[3;1+2;"1+2 should equal 3"]
-    };
-        """, "utf8"))
 
+def parse_and_transpile(parser, text):
+    tree = parser.parse(bytes(text, "utf8"))
     root_node = tree.root_node
     print(root_node.sexp())
     out = deque()
     named = {}
     transpile(root_node, [], out, named)
     print(unparse(out.pop()))
+
+def main():
+    print("Hello Q!")
+
+    parser:Parser = get_parser()
+    parse_and_transpile(parser, "1+2")
+    parse_and_transpile(parser,"""
+        .test.test_add:{
+          AEQ[3;1+2;"1+2 should equal 3"]
+        };
+            """)
 
 
 if __name__ == "__main__":
