@@ -1,4 +1,7 @@
-from _ast import Add, BinOp, Constant, FunctionDef, Call, Name
+import ast
+import typing
+from _ast import Add, BinOp, Constant, FunctionDef, Call, Name, Module, ClassDef, arguments, arg, Attribute
+from pathlib import Path
 from ast import unparse
 
 from tree_sitter import Language, Parser, Node
@@ -146,30 +149,49 @@ def get_parser() -> Parser:
     return parser
 
 
-def parse_and_transpile(parser, text):
+def parse_and_transpile(parser:Parser, text:str, module_name:str):
     tree = parser.parse(bytes(text, "utf8"))
     root_node = tree.root_node
     print(root_node.sexp())
     out = deque()
     named = {}
     transpile(root_node, [], out, named)
-    print(unparse(out.pop()))
+    if 'test' in named:
+        tests: dict = named['test']
+        test_funcs:typing.List[FunctionDef] = list(tests.values())
+        for test_func in test_funcs:
+            test_func.args=arguments(posonlyargs=[],args=[arg(arg='self')],defaults=[],kwonlyargs=[])
+            for stmt in test_func.body:
+                if isinstance(stmt, Call):
+                    test_fn_call:Call = stmt
+                    if isinstance(test_fn_call.func, Name) and test_fn_call.func.id == 'AEQ':
+                        test_fn_call.func = Attribute(value=Name(id='self'), attr='assertEqual')
+
+        test_class_name = module_name[0].upper() + module_name[1:]
+        test_class = ClassDef(test_class_name,[Name(id='unittest.TestCase')],[],test_funcs,[])
+        import_st = ast.parse('import unittest')
+        main = ast.parse('if __name__ == \'__main__\':unittest.main()')
+        mod = Module([import_st, test_class, main], [])
+        print(unparse(mod))
+    else:
+        print(unparse(out.pop()))
 
 
 def parse_and_transpile_file(parser, file_name):
     f = open(file_name, "r")
-    parse_and_transpile(parser, f.read())
+    path:Path = Path(file_name)
+    parse_and_transpile(parser, f.read(), path.stem)
 
 def main():
     print("Hello Q!")
 
     parser:Parser = get_parser()
-    parse_and_transpile(parser, "1+2")
+    parse_and_transpile(parser, "1+2", "example")
     parse_and_transpile(parser,"""
         .test.test_add:{
           AEQ[3;1+2;"1+2 should equal 3"]
         };
-            """)
+            """, "example")
     parse_and_transpile_file(parser, "../q/testExample.q")
 
 
