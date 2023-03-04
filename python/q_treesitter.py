@@ -155,6 +155,11 @@ def parse_and_transpile(parser, text):
     transpile(root_node, [], out, named)
     print(unparse(out.pop()))
 
+
+def parse_and_transpile_file(parser, file_name):
+    f = open(file_name, "r")
+    parse_and_transpile(parser, f.read())
+
 def main():
     print("Hello Q!")
 
@@ -165,6 +170,7 @@ def main():
           AEQ[3;1+2;"1+2 should equal 3"]
         };
             """)
+    parse_and_transpile_file(parser, "../q/testExample.q")
 
 
 if __name__ == "__main__":
