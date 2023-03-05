@@ -1,2 +1,1 @@
 tree_sitter==0.20.1
-pyq==5.0.0

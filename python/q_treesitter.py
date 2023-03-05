@@ -68,8 +68,9 @@ def convert_function_call(node: Node, tail, out: deque, named: dict):
     args_node = node.children[1]
     transpile(args_node, tail, out, named)
     args = []
-    for _ in range(args_node.child_count):
+    for _ in range(len(out)):
         args.append(out.pop())
+    args.reverse()
     call = Call(Name(lhs), args, [])
     out.append(call)
 
@@ -90,9 +91,12 @@ def convert_entity_name(node: Node, tail, out: deque):
     out.append(Name(node.text.decode('utf-8')))
 
 
-def convert_table(node: Node, tail, out: deque, named: dict):
-    assert node.child_count == 3
-    transpile(node.children[1], tail, out, named)
+def convert_index(node: Node, tail, out: deque, named: dict):
+    inputs = deque()
+    for child in node.children:
+        transpile(child, tail, out, named)
+    #assert inputs == 3
+
 
 
 def transpile(node: Node, tail, out: deque, named: dict):
@@ -110,21 +114,25 @@ def transpile(node: Node, tail, out: deque, named: dict):
         convert_string(node, [], out)
     elif node.type == "operator":
         convert_operator(node, tail, out, named)
-    elif node.type == "local_variable_assignment":
+    elif node.type == "variable_assign":
         convert_local_var(node, tail, out, named)
     elif node.type == "function_body":
         convert_function_body(node, tail, out, named)
-    elif node.type == "function_call":
+    elif node.type == "entity_with_index":
         convert_function_call(node, tail, out, named)
     elif node.type == "namespace":
         convert_namespace(node, tail, out, named)
     elif node.type == "entity_name":
         convert_entity_name(node, tail, out)
-    elif node.type == "table":
-        convert_table(node, tail, out, named)
+    elif node.type == "index":
+        convert_index(node, tail, out, named)
     elif node.type == ";":
         None
     elif node.type == ".":
+        None
+    elif node.type == "[":
+        None
+    elif node.type == "]":
         None
     else:
         raise NotImplementedError(node.type)
@@ -197,6 +205,8 @@ def main():
     print(unparse(mod))
     mod = parse_and_transpile_file(parser, "../q/testExample.q")
     print(unparse(mod))
+    # mod = parse_and_transpile(parser,"raze (1 2 3;3; 4 5)")
+    # print(unparse(mod))
 
 
 if __name__ == "__main__":
