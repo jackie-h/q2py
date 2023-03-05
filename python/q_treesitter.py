@@ -19,7 +19,10 @@ def convert_expr_seq(node: Node, tail, out: deque, named: dict):
     l = list(node.children)
     while len(l) > 0:
         node = l.pop()
-        transpile(node, l, out, named)
+        seq = deque()
+        transpile(node, l, seq, named)
+        if len(seq) > 0:
+            out.append(list(seq))
 
 
 def convert_long(node: Node, tail, out: deque):
@@ -75,6 +78,10 @@ def convert_function_call(node: Node, tail, out: deque, named: dict):
     out.append(call)
 
 
+def convert_builtin_function_call(node: Node, tail, out: deque, named: dict):
+    convert_function_call(node, tail, out, named)
+
+
 def convert_function_body(node: Node, tail, out: deque, named: dict):
     assert node.child_count == 3
     transpile(node.children[1], tail, out, named)
@@ -92,12 +99,22 @@ def convert_entity_name(node: Node, tail, out: deque):
 
 
 def convert_index(node: Node, tail, out: deque, named: dict):
-    inputs = deque()
     for child in node.children:
         transpile(child, tail, out, named)
-    #assert inputs == 3
 
 
+def convert_list(node: Node, tail, out: deque, named: dict):
+    for child in node.children:
+        transpile(child, tail, out, named)
+    args = []
+    for _ in range(len(out)):
+        arg = out.pop()
+        if isinstance(arg, list):
+            subs = list(arg)
+            arg = Call(Name('list'), subs, [])
+        args.append(arg)
+    call = Call(Name('list'), args, [])
+    out.append(call)
 
 def transpile(node: Node, tail, out: deque, named: dict):
     print(node.type)
@@ -118,6 +135,8 @@ def transpile(node: Node, tail, out: deque, named: dict):
         convert_local_var(node, tail, out, named)
     elif node.type == "function_body":
         convert_function_body(node, tail, out, named)
+    elif node.type == "builtin_function_call":
+        convert_builtin_function_call(node, tail, out, named)
     elif node.type == "entity_with_index":
         convert_function_call(node, tail, out, named)
     elif node.type == "namespace":
@@ -126,6 +145,8 @@ def transpile(node: Node, tail, out: deque, named: dict):
         convert_entity_name(node, tail, out)
     elif node.type == "index":
         convert_index(node, tail, out, named)
+    elif node.type == "list":
+        convert_list(node, tail, out, named)
     elif node.type == ";":
         None
     elif node.type == ".":
@@ -133,6 +154,10 @@ def transpile(node: Node, tail, out: deque, named: dict):
     elif node.type == "[":
         None
     elif node.type == "]":
+        None
+    elif node.type == "(":
+        None
+    elif node.type == ")":
         None
     else:
         raise NotImplementedError(node.type)
@@ -205,8 +230,8 @@ def main():
     print(unparse(mod))
     mod = parse_and_transpile_file(parser, "../q/testExample.q")
     print(unparse(mod))
-    # mod = parse_and_transpile(parser,"raze (1 2 3;3; 4 5)")
-    # print(unparse(mod))
+    mod = parse_and_transpile(parser,"raze (1 2 3;3; 4 5)", "example")
+    print(unparse(mod))
 
 
 if __name__ == "__main__":
