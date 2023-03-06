@@ -11,8 +11,8 @@ from collections import deque
 def convert_expr_list(node: Node, tail, out: deque, named: dict):
     l = list(node.children)
     while len(l) > 0:
-        node = l.pop()
-        transpile(node, l, out, named)
+        child = l.pop()
+        transpile(child, l, out, named)
 
 
 def convert_expr_seq(node: Node, tail, out: deque, named: dict):
@@ -42,6 +42,12 @@ def convert_operator(node: Node, tail, out: deque, named: dict):
     if node.text == b'+':
         op = BinOp(lhs, Add(), rhs)
         out.append(op)
+    if node.text == b',':
+        #append/combine
+        op = BinOp(lhs, Add(), rhs)
+        out.append(op)
+    else:
+        raise NotImplementedError(node.text)
 
 
 def convert_local_var(node: Node, tail, out: deque, named: dict):
@@ -113,8 +119,10 @@ def convert_list(node: Node, tail, out: deque, named: dict):
             subs = list(arg)
             arg = Call(Name('list'), subs, [])
         args.append(arg)
-    call = Call(Name('list'), args, [])
-    out.append(call)
+    if len(args) > 1:
+        out.append(Call(Name('list'), args, []))
+    else:
+        out.append(args[0])
 
 def transpile(node: Node, tail, out: deque, named: dict):
     print(node.type)
@@ -220,17 +228,21 @@ def main():
     print("Hello Q!")
 
     parser:Parser = get_parser()
-    mod = parse_and_transpile(parser, "1+2", "example")
-    print(unparse(mod))
-    mod = parse_and_transpile(parser,"""
-        .test.test_add:{
-          AEQ[3;1+2;"1+2 should equal 3"]
-        };
-            """, "example")
-    print(unparse(mod))
-    mod = parse_and_transpile_file(parser, "../q/testExample.q")
-    print(unparse(mod))
-    mod = parse_and_transpile(parser,"raze (1 2 3;3; 4 5)", "example")
+    # mod = parse_and_transpile(parser, "1+2", "example")
+    # print(unparse(mod))
+    # mod = parse_and_transpile(parser,"""
+    #     .test.test_add:{
+    #       AEQ[3;1+2;"1+2 should equal 3"]
+    #     };
+    #         """, "example")
+    # print(unparse(mod))
+    # mod = parse_and_transpile_file(parser, "../q/testExample.q")
+    # print(unparse(mod))
+    # mod = parse_and_transpile(parser,"raze (1 2 3;3; 4 5)", "example")
+    # print(unparse(mod))
+
+    mod = parse_and_transpile(parser,"raze \"a\", (string reqId), \"b\"", "example")
+    #mod = parse_and_transpile_file(parser, "../../kdb/kdb-utils/html.q")
     print(unparse(mod))
 
 
