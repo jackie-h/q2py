@@ -2,10 +2,10 @@ import ast
 import typing
 from _ast import Add, BinOp, Constant, FunctionDef, Call, Name, Module, ClassDef, arguments, arg, Attribute
 from pathlib import Path
-from ast import unparse
 
 from tree_sitter import Language, Parser, Node
 from collections import deque
+from astunparse import unparse
 
 
 def convert_expr_list(node: Node, tail, out: deque, named: dict):
@@ -26,13 +26,17 @@ def convert_expr_seq(node: Node, tail, out: deque, named: dict):
 
 
 def convert_long(node: Node, tail, out: deque):
-    out.append(Constant(int(node.text.decode('utf-8'))))
+    out.append(Constant(int(node.text.decode('utf-8')), ""))
 
 
 def convert_string(node: Node, tail, out: deque):
-    str_val_with_quotes: str = node.text.decode('utf-8')
-    str_val = str_val_with_quotes.removesuffix("\"").removeprefix("\"")
-    out.append(Constant(str_val))
+    str_val: str = node.text.decode('utf-8')
+    if str_val.startswith("\""):
+        str_val = str_val[len("\""):]
+    if str_val.endswith("\""):
+        str_val = str_val[:-len("\"")]
+    # str_val = str_val.removesuffix("\"").removeprefix("\"") - Python 3.9 only
+    out.append(Constant(str_val, ""))
 
 
 def convert_operator(node: Node, tail, out: deque, named: dict):
