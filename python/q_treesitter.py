@@ -254,7 +254,9 @@ def parse_and_transpile(parser:Parser, text:str, module_name:str) -> Module:
 def parse_and_transpile_file(parser, file_name) -> Module:
     f = open(file_name, "r")
     path:Path = Path(file_name)
-    return parse_and_transpile(parser, f.read(), path.stem)
+    mod = parse_and_transpile(parser, f.read(), path.stem)
+    f.close()
+    return mod
 
 def main():
     print("Hello Q!")
