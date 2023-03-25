@@ -38,6 +38,14 @@ def convert_string(node: Node, tail, out: deque):
     # str_val = str_val.removesuffix("\"").removeprefix("\"") - Python 3.9 only
     out.append(Constant(str_val, ""))
 
+def convert_boolean(node: Node, tail, out: deque):
+    val = node.text.decode('utf-8')
+    if val == '1b':
+        out.append(Constant(True, ""))
+    elif val == '0b':
+        out.append(Constant(False, ""))
+    else:
+        raise NotImplementedError(node.type)
 
 def convert_operator(node: Node, tail, out: deque, named: dict):
     lhs = out.pop()
@@ -157,6 +165,8 @@ def transpile(node: Node, tail, out: deque, named: dict):
         convert_long(node, [], out)
     elif node.type == "string":
         convert_string(node, [], out)
+    elif node.type == "boolean":
+        convert_boolean(node, [], out)
     elif node.type == "operator":
         convert_operator(node, tail, out, named)
     elif node.type == "variable_assign":

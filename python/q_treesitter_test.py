@@ -5,6 +5,10 @@ from astunparse import unparse
 
 
 class TestStringMethods(unittest.TestCase):
+    def test_boolean(self):
+        self.assertEqual(self.parse('1b'), 'True\n')
+        self.assertEqual(self.parse('0b'), 'False\n')
+
     def test_symbol(self):
         self.assertEqual(self.parse('`x'), 'x\n')
 
