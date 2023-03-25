@@ -54,7 +54,7 @@ def convert_operator(node: Node, tail, out: deque, named: dict):
     if node.text == b'+':
         op = BinOp(lhs, Add(), rhs)
         out.append(op)
-    if node.text == b',':
+    elif node.text == b',':
         #append/combine
         op = BinOp(lhs, Add(), rhs)
         out.append(op)
@@ -233,7 +233,7 @@ def parse_and_transpile(parser:Parser, text:str, module_name:str) -> Module:
         tests: dict = named['test']
         test_funcs:typing.List[FunctionDef] = list(tests.values())
         for test_func in test_funcs:
-            test_func.args=arguments(posonlyargs=[],args=[arg(arg='self')],defaults=[],kwonlyargs=[])
+            test_func.args=arguments(posonlyargs=[],args=[arg(arg='self',annotation=[])],defaults=[],kwonlyargs=[],vararg=[],kwarg=[])
             for stmt in test_func.body:
                 if isinstance(stmt, Call):
                     test_fn_call:Call = stmt

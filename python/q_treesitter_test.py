@@ -15,6 +15,9 @@ class TestStringMethods(unittest.TestCase):
     def test_symbol_with_namespace(self):
         self.assertEqual(self.parse('`.x.y'), 'x.y\n')
 
+    def test_op_add(self):
+        self.assertEqual(self.parse('1+2'), '(2 + 1)\n')
+
     def parse(self, input):
         parser = get_parser()
         module = parse_and_transpile(parser, input, 'test')
