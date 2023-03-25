@@ -128,6 +128,22 @@ def convert_list(node: Node, tail, out: deque, named: dict):
     else:
         out.append(args[0])
 
+def convert_symbol(node: Node, tail, out: deque, named: dict):
+    symbol_name: str = node.text.decode('utf-8')
+    if len(symbol_name) > 1:
+        symbol_name = symbol_name[len("`"):]
+        name = Name(symbol_name)
+        out.append(name)
+
+    if len(out) == 1:
+        return
+    elif len(out) == 2:
+        val = out.pop()
+        name = out.pop()
+        out.append(Attribute(name,attr=val.id))
+    else:
+        print(node)
+
 def transpile(node: Node, tail, out: deque, named: dict):
     print(node.type)
     if node.type == "source_file":
@@ -159,6 +175,8 @@ def transpile(node: Node, tail, out: deque, named: dict):
         convert_index(node, tail, out, named)
     elif node.type == "list":
         convert_list(node, tail, out, named)
+    elif node.type == "symbol":
+        convert_symbol(node, tail, out, named)
     elif node.type == ";":
         None
     elif node.type == ".":
@@ -240,12 +258,12 @@ def main():
     #     };
     #         """, "example")
     # print(unparse(mod))
-    # mod = parse_and_transpile_file(parser, "../q/testExample.q")
+    mod = parse_and_transpile_file(parser, "../q/testExample.q")
     # print(unparse(mod))
     # mod = parse_and_transpile(parser,"raze (1 2 3;3; 4 5)", "example")
     # print(unparse(mod))
 
-    mod = parse_and_transpile(parser,"raze \"a\", (string reqId), \"b\"", "example")
+    # mod = parse_and_transpile(parser,"raze \"a\", (string reqId), \"b\"", "example")
     #mod = parse_and_transpile_file(parser, "../../kdb/kdb-utils/html.q")
     print(unparse(mod))
 

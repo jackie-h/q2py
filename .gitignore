@@ -4,3 +4,4 @@ js/node_modules
 js/tree_sitter_demo_ts.js
 vendor
 .DS_Store
+python/__pycache__/
