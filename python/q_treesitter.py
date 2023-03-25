@@ -76,11 +76,20 @@ def convert_local_var(node: Node, tail, out: deque, named: dict):
 
     var_name: Name = names.pop()
     transpile(node.children[2], tail, out, named)
-    value = out.pop()
     if node.children[2].type == "function_body":
-        func = FunctionDef(var_name.id, [], body=[value], decorator_list=[], lineno=0)
+        exprs = []
+        while len(out) > 0:
+            val = out.pop()
+            if isinstance(val,list):
+                while len(val) > 0:
+                    exprs.append(val.pop())
+            else:
+                exprs.append(val)
+        func = FunctionDef(var_name.id, [], body=exprs, decorator_list=[], lineno=0)
         out.append(func)
         parent[var_name.id] = func
+    else:
+        raise NotImplementedError
 
 
 def convert_function_call(node: Node, tail, out: deque, named: dict):

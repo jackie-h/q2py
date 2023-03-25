@@ -29,6 +29,17 @@ if (__name__ == '__main__'):
     unittest.main()
 ''')
 
+    def test_test_mocks(self):
+            self.assertEqual(self.parse_file("../q/testMocks.q"), '''
+import unittest
+
+class TestMocks(unittest.TestCase):
+
+    def test_mocks(self):MOCK(e.DEBUG, False)MOCK(e.ENV.utest)MOCK(get(s.doX, z), x, y, z)MOCK(s.assertOk, True)
+if (__name__ == '__main__'):
+    unittest.main()
+''')
+
     def parse(self, input):
         parser = get_parser()
         module = parse_and_transpile(parser, input, 'test')
