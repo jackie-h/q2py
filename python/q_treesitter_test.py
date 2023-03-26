@@ -43,6 +43,8 @@ class TestStringMethods(unittest.TestCase):
     def test_op_join(self):
         self.assertEqual(self.parse('"abc", "de"'), '(\'de\' + \'abc\')\n')
 
+    def test_op_each_join(self):
+        self.assertEqual(self.parse('("abc"; "uv"),\'("de"; "xyz")'), "\nfor (x, y) in zip(list(list('de'), list('xyz')), list(list('abc'), list('uv'))):(x + y)\n")
 
     def test_dictionary(self):
         self.assertEqual(self.parse('10 20 30!1.1 2.2 3.3'),'{1.1: 10, 2.2: 20, 3.3: 30}\n')

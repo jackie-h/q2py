@@ -1,7 +1,7 @@
 import ast
 import typing
 from _ast import Add, BinOp, Constant, FunctionDef, Call, Name, Module, ClassDef, arguments, arg, Attribute, Dict, \
-    operator, Sub, Mult, Div, And, Or, boolop, BoolOp
+    operator, Sub, Mult, Div, And, Or, boolop, BoolOp, For, Tuple
 from pathlib import Path
 
 from tree_sitter import Language, Parser, Node
@@ -79,6 +79,20 @@ def convert_operator(node: Node, tail, out: deque, named: dict):
             values.append(out.pop())
         op = Dict(keys, values)
         out.append(op)
+    elif node.text == b'\'': #each
+        lhs_args = []
+        while len(out) > 0:
+            lhs_args.append(out.pop())
+        each_op = tail.pop()
+        while len(tail) > 0:
+            transpile(tail.pop(), tail, out, named)
+        rhs_args = []
+        while len(out) > 0:
+            rhs_args.append(out.pop())
+        l1 = Name(id='x')
+        l2 = Name(id='y')
+        exp = BinOp(l1, Add(), l2)
+        out.append(For(Tuple([l1,l2]),Call(Name('zip'), [lhs_args,rhs_args], []),exp,[]))
     else:
         raise NotImplementedError(node.text)
 
