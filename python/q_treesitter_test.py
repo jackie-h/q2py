@@ -34,8 +34,8 @@ class TestQ2Py(unittest.TestCase):
     def test_op_add(self):
         self.assertEqual(self.parse('1+2'), '(2 + 1)\n')
 
-#    def test_op_subtract(self):
-#        self.assertEqual(self.parse('1-2'), '(2 - 1)\n')
+    #    def test_op_subtract(self):
+    #        self.assertEqual(self.parse('1-2'), '(2 - 1)\n')
 
     def test_op_multiply(self):
         self.assertEqual(self.parse('1*2'), '(2 * 1)\n')
@@ -60,11 +60,11 @@ class TestQ2Py(unittest.TestCase):
         self.assertEqual(self.parse('\'"abc"'), "\nraise 'abc'\n")
 
     def test_op_take(self):
-        #takes the first 5 elements of the list
-        self.assertEqual(self.parse('5#0 1 2 3 4 5 6 7 8'),'numpy.array(0, 1, 2, 3, 4, 5, 6, 7, 8)[:5]\n')
+        # takes the first 5 elements of the list
+        self.assertEqual(self.parse('5#0 1 2 3 4 5 6 7 8'), 'numpy.array(0, 1, 2, 3, 4, 5, 6, 7, 8)[:5]\n')
 
     def test_dictionary(self):
-        self.assertEqual(self.parse('10 20 30!1.1 2.2 3.3'),'{1.1: 10, 2.2: 20, 3.3: 30}\n')
+        self.assertEqual(self.parse('10 20 30!1.1 2.2 3.3'), '{1.1: 10, 2.2: 20, 3.3: 30}\n')
 
     def test_variable(self):
         self.assertEqual(self.parse('p: 10000'), '\np = 10000\n')
@@ -81,7 +81,7 @@ if (__name__ == '__main__'):
 ''')
 
     def test_test_mocks(self):
-            self.assertEqual(self.parse_file("../q/testMocks.q"), '''
+        self.assertEqual(self.parse_file("../q/testMocks.q"), '''
 import unittest
 
 class TestMocks(unittest.TestCase):
