@@ -50,7 +50,7 @@ def convert_boolean(node: Node, tail, out: deque):
     elif val == '0b':
         out.append(Constant(False, ""))
     else:
-        error(node.type)
+        error(node.type, out)
 
 def convert_operator(node: Node, tail, out: deque, named: dict):
     if node.text == b'+':
@@ -92,7 +92,7 @@ def convert_operator(node: Node, tail, out: deque, named: dict):
             rhs_args.append(out.pop())
         out.append(Call(Name('numpy.add'), [lhs_args,rhs_args], []))
     else:
-        error('operator=' + node.text.decode('utf-8'))
+        error('operator=' + node.text.decode('utf-8'), out)
 
 
 def convert_bin_op(op: operator, tail, out: deque, named: dict):
@@ -138,7 +138,7 @@ def convert_local_var(node: Node, tail, out: deque, named: dict):
     elif len(out) == 1:
         out.append(Assign([var_name], out.pop()))
     else:
-        error('local var multiple assign')
+        error('local var multiple assign', out)
 
 
 def convert_function_call(node: Node, tail, out: deque, named: dict):
@@ -203,7 +203,7 @@ def convert_symbol(node: Node, tail, out: deque, named: dict):
         name = out.pop()
         out.append(Attribute(name,attr=val.id))
     else:
-        error('symbol namespace larger than 2 ' + symbol_name)
+        error('symbol namespace larger than 2 ' + symbol_name, out)
 
 def transpile(node: Node, tail, out: deque, named: dict):
     if node.type == "source_file":
@@ -256,13 +256,14 @@ def transpile(node: Node, tail, out: deque, named: dict):
     elif node.type == ")":
         None
     else:
-        error(node.type)
+        error(node.type, out)
     return out
 
-def error(message:str):
+def error(message:str, out):
     if SHOULD_ERROR:
         raise NotImplementedError(message)
     else:
+        out.clear() #clear the current stack and try to continue
         print('ERROR not implemented:' + message)
 
 def get_parser(path:str) -> Parser:
