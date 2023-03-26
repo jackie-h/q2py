@@ -215,6 +215,8 @@ def transpile(node: Node, tail, out: deque, named: dict):
         convert_list(node, tail, out, named)
     elif node.type == "symbol":
         convert_symbol(node, tail, out, named)
+    elif node.type == "comment":
+        None
     elif node.type == ";":
         None
     elif node.type == ".":
@@ -275,7 +277,10 @@ def parse_and_transpile(parser:Parser, text:str, module_name:str) -> Module:
         mod = Module([import_st, test_class, main], [])
         return mod
     else:
-        mod = Module([out.pop()],[])
+        out_nodes = []
+        if len(out) > 0:
+            out_nodes.append(out.pop())
+        mod = Module(out_nodes,[])
         return mod
 
 

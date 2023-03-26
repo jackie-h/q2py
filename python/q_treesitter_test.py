@@ -6,6 +6,9 @@ from astunparse import unparse
 
 class TestStringMethods(unittest.TestCase):
 
+    def test_comment(self):
+        self.assertEqual(self.parse('/ a comment'), '\n')
+
     def test_float(self):
         self.assertEqual(self.parse('1.2'), '1.2\n')
 
