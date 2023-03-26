@@ -29,6 +29,9 @@ def convert_long(node: Node, tail, out: deque):
     out.append(Constant(int(node.text.decode('utf-8')), ""))
 
 
+def convert_float(node: Node, tail, out: deque):
+    out.append(Constant(float(node.text.decode('utf-8')), ""))
+
 def convert_string(node: Node, tail, out: deque):
     str_val: str = node.text.decode('utf-8')
     if str_val.startswith("\""):
@@ -172,6 +175,8 @@ def transpile(node: Node, tail, out: deque, named: dict):
         convert_expr_seq(node, tail, out, named)
     elif node.type == "long":
         convert_long(node, [], out)
+    elif node.type == "float":
+        convert_float(node, [], out)
     elif node.type == "string":
         convert_string(node, [], out)
     elif node.type == "boolean":
