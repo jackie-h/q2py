@@ -183,7 +183,6 @@ def convert_list(node: Node, tail, out: deque, named: dict):
     args = []
     while len(out) > 0:
         args.append(out.pop())
-
     out.append(Call(Name('numpy.array'), args, []))
 
 
