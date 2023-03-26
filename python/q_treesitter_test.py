@@ -9,6 +9,13 @@ class TestQ2Py(unittest.TestCase):
     def test_comment(self):
         self.assertEqual(self.parse('/ a comment'), '\n')
 
+    def test_long(self):
+        self.assertEqual(self.parse('1'), '1\n')
+        self.assertEqual(self.parse('1j'), '1\n')
+
+    def test_int(self):
+        self.assertEqual(self.parse('2i'), '2\n')
+
     def test_float(self):
         self.assertEqual(self.parse('1.2'), '1.2\n')
         self.assertEqual(self.parse('1f'), '1.0\n')

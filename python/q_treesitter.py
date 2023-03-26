@@ -28,8 +28,16 @@ def convert_expr_seq(node: Node, tail, out: deque, named: dict):
 
 
 def convert_long(node: Node, tail, out: deque):
-    out.append(Constant(int(node.text.decode('utf-8')), ""))
+    val:str = node.text.decode('utf-8')
+    if val.endswith('j'):
+        val = val[:len(val)-1]
+    out.append(Constant(int(val), ""))
 
+def convert_int(node: Node, tail, out: deque):
+    val:str = node.text.decode('utf-8')
+    if val.endswith('i'):
+        val = val[:len(val)-1]
+    out.append(Constant(int(val), ""))
 
 def convert_float(node: Node, tail, out: deque):
     val:str = node.text.decode('utf-8')
@@ -236,6 +244,8 @@ def transpile(node: Node, tail, out: deque, named: dict):
         convert_expr_seq(node, tail, out, named)
     elif node.type == "long":
         convert_long(node, [], out)
+    elif node.type == "int":
+        convert_int(node, [], out)
     elif node.type == "float":
         convert_float(node, [], out)
     elif node.type == "string":
