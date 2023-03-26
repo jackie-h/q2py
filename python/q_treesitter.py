@@ -171,14 +171,17 @@ def convert_local_var(node: Node, tail, out: deque, named: dict):
 
 
 def convert_function_call(node: Node, tail, out: deque, named: dict):
-    assert node.child_count == 2
+    assert node.child_count > 0
     lhs = node.children[0].text.decode('utf-8')
-    args_node = node.children[1]
-    transpile(args_node, tail, out, named)
     args = []
-    for _ in range(len(out)):
-        args.append(out.pop())
-    args.reverse()
+    if node.child_count == 2:
+        args_node = node.children[1]
+        transpile(args_node, tail, out, named)
+        for _ in range(len(out)):
+            args.append(out.pop())
+        args.reverse()
+    else:
+        error('unexpected args for function', out)
     call = Call(Name(lhs), args, [])
     out.append(call)
 
