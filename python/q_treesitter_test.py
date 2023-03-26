@@ -22,6 +22,9 @@ class TestStringMethods(unittest.TestCase):
     def test_op_add(self):
         self.assertEqual(self.parse('1+2'), '(2 + 1)\n')
 
+    def test_dictionary(self):
+        self.assertEqual(self.parse('10 20 30!1.1 2.2 3.3'),'{1.1: 10, 2.2: 20, 3.3: 30}\n')
+
     def test_test(self):
         self.assertEqual(self.parse_file("../q/testExample.q"), '''
 import unittest

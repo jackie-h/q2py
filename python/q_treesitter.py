@@ -1,6 +1,6 @@
 import ast
 import typing
-from _ast import Add, BinOp, Constant, FunctionDef, Call, Name, Module, ClassDef, arguments, arg, Attribute
+from _ast import Add, BinOp, Constant, FunctionDef, Call, Name, Module, ClassDef, arguments, arg, Attribute, Dict
 from pathlib import Path
 
 from tree_sitter import Language, Parser, Node
@@ -51,15 +51,29 @@ def convert_boolean(node: Node, tail, out: deque):
         raise NotImplementedError(node.type)
 
 def convert_operator(node: Node, tail, out: deque, named: dict):
-    lhs = out.pop()
-    transpile(tail.pop(), tail, out, named)
-    rhs = out.pop()
     if node.text == b'+':
+        lhs = out.pop()
+        transpile(tail.pop(), tail, out, named)
+        rhs = out.pop()
         op = BinOp(lhs, Add(), rhs)
         out.append(op)
     elif node.text == b',':
         #append/combine
+        lhs = out.pop()
+        transpile(tail.pop(), tail, out, named)
+        rhs = out.pop()
         op = BinOp(lhs, Add(), rhs)
+        out.append(op)
+    elif node.text == b'!': #dictionary
+        keys = []
+        while len(out) > 0:
+            keys.append(out.pop())
+        while len(tail) > 0:
+            transpile(tail.pop(), tail, out, named)
+        values = []
+        while len(out) > 0:
+            values.append(out.pop())
+        op = Dict(keys, values)
         out.append(op)
     else:
         raise NotImplementedError(node.text)
