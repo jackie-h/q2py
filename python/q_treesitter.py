@@ -32,7 +32,10 @@ def convert_long(node: Node, tail, out: deque):
 
 
 def convert_float(node: Node, tail, out: deque):
-    out.append(Constant(float(node.text.decode('utf-8')), ""))
+    val:str = node.text.decode('utf-8')
+    if val.endswith('f'):
+        val = val[:len(val)-1]
+    out.append(Constant(float(val), ""))
 
 def convert_string(node: Node, tail, out: deque):
     str_val: str = node.text.decode('utf-8')
