@@ -28,6 +28,9 @@ class TestStringMethods(unittest.TestCase):
     def test_list(self):
         self.assertEqual(self.parse('(1;2;3)'), 'numpy.array(1, 2, 3)\n')
 
+    def test_empty_list(self):
+        self.assertEqual(self.parse('()'), 'numpy.array()\n')
+
     def test_op_add(self):
         self.assertEqual(self.parse('1+2'), '(2 + 1)\n')
 

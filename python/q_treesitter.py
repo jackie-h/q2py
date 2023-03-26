@@ -181,16 +181,11 @@ def convert_list(node: Node, tail, out: deque, named: dict):
     for child in node.children:
         transpile(child, tail, out, named)
     args = []
-    for _ in range(len(out)):
-        arg = out.pop()
-        if isinstance(arg, list):
-            subs = list(arg)
-            arg = Call(Name('numpy.array'), subs, [])
-        args.append(arg)
-    if len(args) > 1:
-        out.append(Call(Name('numpy.array'), args, []))
-    else:
-        out.append(args[0])
+    while len(out) > 0:
+        args.append(out.pop())
+
+    out.append(Call(Name('numpy.array'), args, []))
+
 
 def convert_symbol(node: Node, tail, out: deque, named: dict):
     symbol_name: str = node.text.decode('utf-8')
