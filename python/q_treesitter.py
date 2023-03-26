@@ -208,7 +208,6 @@ def convert_symbol(node: Node, tail, out: deque, named: dict):
         print(node)
 
 def transpile(node: Node, tail, out: deque, named: dict):
-    print(node.type)
     if node.type == "source_file":
         for child in node.children:
             transpile(child, [], out, named)
@@ -263,14 +262,14 @@ def transpile(node: Node, tail, out: deque, named: dict):
     return out
 
 
-def get_parser() -> Parser:
+def get_parser(path:str) -> Parser:
     Language.build_library(
         # Store the library in the `build` directory
         'build/my-languages.so',
 
         # Include one or more languages
         [
-            '../../tree-sitter-q',
+            path,
         ]
     )
 
@@ -321,24 +320,10 @@ def parse_and_transpile_file(parser, file_name) -> Module:
     return mod
 
 def main():
-    print("Hello Q!")
+    print("Running q2Py!")
 
-    parser:Parser = get_parser()
-    # mod = parse_and_transpile(parser, "1+2", "example")
-    # print(unparse(mod))
-    # mod = parse_and_transpile(parser,"""
-    #     .test.test_add:{
-    #       AEQ[3;1+2;"1+2 should equal 3"]
-    #     };
-    #         """, "example")
-    # print(unparse(mod))
+    parser:Parser = get_parser('../../tree-sitter-q')
     mod = parse_and_transpile_file(parser, "../q/testExample.q")
-    # print(unparse(mod))
-    # mod = parse_and_transpile(parser,"raze (1 2 3;3; 4 5)", "example")
-    # print(unparse(mod))
-
-    # mod = parse_and_transpile(parser,"raze \"a\", (string reqId), \"b\"", "example")
-    #mod = parse_and_transpile_file(parser, "../../kdb/kdb-utils/html.q")
     print(unparse(mod))
 
 
