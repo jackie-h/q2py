@@ -76,11 +76,11 @@ if (__name__ == '__main__'):
 ''')
 
     def parse(self, input):
-        parser = get_parser()
+        parser = get_parser('../../tree-sitter-q')
         module = parse_and_transpile(parser, input, 'test')
         return unparse(module)
 
     def parse_file(self, input):
-        parser = get_parser()
+        parser = get_parser('../../tree-sitter-q')
         module = parse_and_transpile_file(parser, input)
         return unparse(module)

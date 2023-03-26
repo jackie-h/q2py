@@ -8,6 +8,7 @@ from tree_sitter import Language, Parser, Node
 from collections import deque
 from astunparse import unparse
 
+SHOULD_ERROR = True
 
 def convert_expr_list(node: Node, tail, out: deque, named: dict):
     l = list(node.children)
@@ -49,7 +50,7 @@ def convert_boolean(node: Node, tail, out: deque):
     elif val == '0b':
         out.append(Constant(False, ""))
     else:
-        raise NotImplementedError(node.type)
+        error(node.type)
 
 def convert_operator(node: Node, tail, out: deque, named: dict):
     if node.text == b'+':
@@ -91,7 +92,7 @@ def convert_operator(node: Node, tail, out: deque, named: dict):
             rhs_args.append(out.pop())
         out.append(Call(Name('numpy.add'), [lhs_args,rhs_args], []))
     else:
-        raise NotImplementedError(node.text)
+        error('operator=' + node.text.decode('utf-8'))
 
 
 def convert_bin_op(op: operator, tail, out: deque, named: dict):
@@ -135,7 +136,7 @@ def convert_local_var(node: Node, tail, out: deque, named: dict):
         out.append(func)
         parent[var_name.id] = func
     else:
-        raise NotImplementedError
+        error('local var type unknown')
 
 
 def convert_function_call(node: Node, tail, out: deque, named: dict):
@@ -258,9 +259,14 @@ def transpile(node: Node, tail, out: deque, named: dict):
     elif node.type == ")":
         None
     else:
-        raise NotImplementedError(node.type)
+        error(node.type)
     return out
 
+def error(message:str):
+    if SHOULD_ERROR:
+        raise NotImplementedError(message)
+    else:
+        print('ERROR not implemented:' + message)
 
 def get_parser(path:str) -> Parser:
     Language.build_library(
