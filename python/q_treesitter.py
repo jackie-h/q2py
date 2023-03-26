@@ -1,7 +1,7 @@
 import ast
 import typing
 from _ast import Add, BinOp, Constant, FunctionDef, Call, Name, Module, ClassDef, arguments, arg, Attribute, Dict, \
-    operator, Sub, Mult, Div
+    operator, Sub, Mult, Div, And, Or, boolop, BoolOp
 from pathlib import Path
 
 from tree_sitter import Language, Parser, Node
@@ -53,16 +53,20 @@ def convert_boolean(node: Node, tail, out: deque):
 
 def convert_operator(node: Node, tail, out: deque, named: dict):
     if node.text == b'+':
-        convert_bin_op(Add(), node, tail, out, named)
+        convert_bin_op(Add(), tail, out, named)
     elif node.text == b'-':
-        convert_bin_op(Sub(), node, tail, out, named)
+        convert_bin_op(Sub(), tail, out, named)
     elif node.text == b'*':
-        convert_bin_op(Mult(), node, tail, out, named)
+        convert_bin_op(Mult(), tail, out, named)
     elif node.text == b'%':
-        convert_bin_op(Div(), node, tail, out, named)
+        convert_bin_op(Div(), tail, out, named)
+    elif node.text == b'&':
+        convert_bool_op(And(), tail, out, named)
+    elif node.text == b'|':
+        convert_bool_op(Or(), tail, out, named)
     elif node.text == b',':
         #append/combine
-        convert_bin_op(Add(), node, tail, out, named)
+        convert_bin_op(Add(), tail, out, named)
     elif node.text == b'!': #dictionary
         keys = []
         while len(out) > 0:
@@ -78,11 +82,18 @@ def convert_operator(node: Node, tail, out: deque, named: dict):
         raise NotImplementedError(node.text)
 
 
-def convert_bin_op(op: operator, node: Node, tail, out: deque, named: dict):
+def convert_bin_op(op: operator, tail, out: deque, named: dict):
     lhs = out.pop()
     transpile(tail.pop(), tail, out, named)
     rhs = out.pop()
     opn = BinOp(lhs, op, rhs)
+    out.append(opn)
+
+def convert_bool_op(op: boolop, tail, out: deque, named: dict):
+    lhs = out.pop()
+    transpile(tail.pop(), tail, out, named)
+    rhs = out.pop()
+    opn = BoolOp(op, [lhs,rhs])
     out.append(opn)
 
 def convert_local_var(node: Node, tail, out: deque, named: dict):
