@@ -89,10 +89,7 @@ def convert_operator(node: Node, tail, out: deque, named: dict):
         rhs_args = []
         while len(out) > 0:
             rhs_args.append(out.pop())
-        l1 = Name(id='x')
-        l2 = Name(id='y')
-        exp = BinOp(l1, Add(), l2)
-        out.append(For(Tuple([l1,l2]),Call(Name('zip'), [lhs_args,rhs_args], []),exp,[]))
+        out.append(Call(Name('numpy.add'), [lhs_args,rhs_args], []))
     else:
         raise NotImplementedError(node.text)
 
