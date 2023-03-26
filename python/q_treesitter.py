@@ -23,7 +23,7 @@ def convert_expr_seq(node: Node, tail, out: deque, named: dict):
         seq = deque()
         transpile(node, l, seq, named)
         if len(seq) > 0:
-            out.append(list(seq))
+            out.append(seq.pop())
 
 
 def convert_long(node: Node, tail, out: deque):

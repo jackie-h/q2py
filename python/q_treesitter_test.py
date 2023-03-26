@@ -22,6 +22,9 @@ class TestStringMethods(unittest.TestCase):
     def test_symbol_with_namespace(self):
         self.assertEqual(self.parse('`.x.y'), 'x.y\n')
 
+    def test_list(self):
+        self.assertEqual(self.parse('(1;2;3)'), 'list(1, 2, 3)\n')
+
     def test_op_add(self):
         self.assertEqual(self.parse('1+2'), '(2 + 1)\n')
 
@@ -44,7 +47,7 @@ class TestStringMethods(unittest.TestCase):
         self.assertEqual(self.parse('"abc", "de"'), '(\'de\' + \'abc\')\n')
 
     def test_op_each_join(self):
-        self.assertEqual(self.parse('("abc"; "uv"),\'("de"; "xyz")'), "\nfor (x, y) in zip(list(list('de'), list('xyz')), list(list('abc'), list('uv'))):(x + y)\n")
+        self.assertEqual(self.parse('("abc"; "uv"),\'("de"; "xyz")'), "\nfor (x, y) in zip(list('de', 'xyz'), list('abc', 'uv')):(x + y)\n")
 
     def test_dictionary(self):
         self.assertEqual(self.parse('10 20 30!1.1 2.2 3.3'),'{1.1: 10, 2.2: 20, 3.3: 30}\n')
