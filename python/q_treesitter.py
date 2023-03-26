@@ -1,7 +1,7 @@
 import ast
 import typing
 from _ast import Add, BinOp, Constant, FunctionDef, Call, Name, Module, ClassDef, arguments, arg, Attribute, Dict, \
-    operator, Sub, Mult, Div, And, Or, boolop, BoolOp, For, Tuple, Assign, Raise, Subscript, Slice
+    operator, Sub, Mult, Div, And, Or, boolop, BoolOp, For, Tuple, Assign, Raise, Subscript, Slice, Compare, cmpop, Eq
 from pathlib import Path
 
 from tree_sitter import Language, Parser, Node
@@ -72,6 +72,8 @@ def convert_operator(node: Node, tail, out: deque, named: dict):
         convert_bin_op(Mult(), tail, out, named)
     elif node.text == b'%':
         convert_bin_op(Div(), tail, out, named)
+    elif node.text == b'=':
+        convert_compare_op(Eq(), tail, out, named)
     elif node.text == b'&':
         convert_bool_op(And(), tail, out, named)
     elif node.text == b'|':
@@ -139,6 +141,13 @@ def convert_bool_op(op: boolop, tail, out: deque, named: dict):
     transpile(tail.pop(), tail, out, named)
     rhs = out.pop()
     opn = BoolOp(op, [lhs,rhs])
+    out.append(opn)
+
+def convert_compare_op(op: cmpop, tail, out: deque, named: dict):
+    lhs = out.pop()
+    transpile(tail.pop(), tail, out, named)
+    rhs = out.pop()
+    opn = Compare(lhs, [op], [rhs])
     out.append(opn)
 
 def convert_local_var(node: Node, tail, out: deque, named: dict):
