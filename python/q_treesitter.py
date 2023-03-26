@@ -1,7 +1,7 @@
 import ast
 import typing
 from _ast import Add, BinOp, Constant, FunctionDef, Call, Name, Module, ClassDef, arguments, arg, Attribute, Dict, \
-    operator, Sub, Mult, Div, And, Or, boolop, BoolOp, For, Tuple, Assign, Raise
+    operator, Sub, Mult, Div, And, Or, boolop, BoolOp, For, Tuple, Assign, Raise, Subscript, Slice
 from pathlib import Path
 
 from tree_sitter import Language, Parser, Node
@@ -94,6 +94,21 @@ def convert_operator(node: Node, tail, out: deque, named: dict):
             out.append(Call(Name('numpy.add'), [lhs_args,rhs_args], []))
         else: #this is a signal (exception)
             out.append(Raise(lhs_args, []))
+    elif node.text == b'#':  # take or set attribute
+        lhs_args = []
+        while len(out) > 0:
+            lhs_args.append(out.pop())
+        while len(tail) > 0:
+            transpile(tail.pop(), tail, out, named)
+        rhs_args = []
+        while len(out) > 0:
+            rhs_args.append(out.pop())
+        lhs = None
+        if len(lhs_args) > 1:
+            lhs = Call(Name('numpy.array'), lhs_args, [])
+        elif len(lhs_args) == 1:
+            lhs = lhs_args[0]
+        out.append(Subscript(lhs,Slice([],rhs_args,[])))
     else:
         error('operator=' + node.text.decode('utf-8'), out)
 

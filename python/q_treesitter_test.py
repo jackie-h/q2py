@@ -59,6 +59,10 @@ class TestQ2Py(unittest.TestCase):
     def test_signal_error(self):
         self.assertEqual(self.parse('\'"abc"'), "\nraise 'abc'\n")
 
+    def test_op_take(self):
+        #takes the first 5 elements of the list
+        self.assertEqual(self.parse('5#0 1 2 3 4 5 6 7 8'),'numpy.array(0, 1, 2, 3, 4, 5, 6, 7, 8)[:5]\n')
+
     def test_dictionary(self):
         self.assertEqual(self.parse('10 20 30!1.1 2.2 3.3'),'{1.1: 10, 2.2: 20, 3.3: 30}\n')
 
