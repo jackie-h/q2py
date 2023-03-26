@@ -1,6 +1,7 @@
 import ast
 import typing
-from _ast import Add, BinOp, Constant, FunctionDef, Call, Name, Module, ClassDef, arguments, arg, Attribute, Dict
+from _ast import Add, BinOp, Constant, FunctionDef, Call, Name, Module, ClassDef, arguments, arg, Attribute, Dict, \
+    operator, Sub, Mult, Div
 from pathlib import Path
 
 from tree_sitter import Language, Parser, Node
@@ -52,18 +53,16 @@ def convert_boolean(node: Node, tail, out: deque):
 
 def convert_operator(node: Node, tail, out: deque, named: dict):
     if node.text == b'+':
-        lhs = out.pop()
-        transpile(tail.pop(), tail, out, named)
-        rhs = out.pop()
-        op = BinOp(lhs, Add(), rhs)
-        out.append(op)
+        convert_bin_op(Add(), node, tail, out, named)
+    elif node.text == b'-':
+        convert_bin_op(Sub(), node, tail, out, named)
+    elif node.text == b'*':
+        convert_bin_op(Mult(), node, tail, out, named)
+    elif node.text == b'%':
+        convert_bin_op(Div(), node, tail, out, named)
     elif node.text == b',':
         #append/combine
-        lhs = out.pop()
-        transpile(tail.pop(), tail, out, named)
-        rhs = out.pop()
-        op = BinOp(lhs, Add(), rhs)
-        out.append(op)
+        convert_bin_op(Add(), node, tail, out, named)
     elif node.text == b'!': #dictionary
         keys = []
         while len(out) > 0:
@@ -78,6 +77,13 @@ def convert_operator(node: Node, tail, out: deque, named: dict):
     else:
         raise NotImplementedError(node.text)
 
+
+def convert_bin_op(op: operator, node: Node, tail, out: deque, named: dict):
+    lhs = out.pop()
+    transpile(tail.pop(), tail, out, named)
+    rhs = out.pop()
+    opn = BinOp(lhs, op, rhs)
+    out.append(opn)
 
 def convert_local_var(node: Node, tail, out: deque, named: dict):
     assert node.child_count == 3
