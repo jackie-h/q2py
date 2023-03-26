@@ -19,6 +19,9 @@ class TestStringMethods(unittest.TestCase):
     def test_symbol(self):
         self.assertEqual(self.parse('`x'), 'x\n')
 
+    def test_null_symbol(self):
+        self.assertEqual(self.parse('`'), 'None\n')
+
     def test_symbol_with_namespace(self):
         self.assertEqual(self.parse('`.x.y'), 'x.y\n')
 

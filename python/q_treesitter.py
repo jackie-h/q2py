@@ -198,7 +198,8 @@ def convert_symbol(node: Node, tail, out: deque, named: dict):
         symbol_name = symbol_name[len("`"):]
         name = Name(symbol_name)
         out.append(name)
-
+    if len(out) == 0:
+        out.append(Constant(None, ""))
     if len(out) == 1:
         return
     elif len(out) == 2:
@@ -206,7 +207,7 @@ def convert_symbol(node: Node, tail, out: deque, named: dict):
         name = out.pop()
         out.append(Attribute(name,attr=val.id))
     else:
-        print(node)
+        error('symbol namespace larger than 2 ' + symbol_name)
 
 def transpile(node: Node, tail, out: deque, named: dict):
     if node.type == "source_file":
