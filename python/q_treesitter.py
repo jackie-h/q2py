@@ -187,10 +187,10 @@ def convert_list(node: Node, tail, out: deque, named: dict):
         arg = out.pop()
         if isinstance(arg, list):
             subs = list(arg)
-            arg = Call(Name('list'), subs, [])
+            arg = Call(Name('numpy.array'), subs, [])
         args.append(arg)
     if len(args) > 1:
-        out.append(Call(Name('list'), args, []))
+        out.append(Call(Name('numpy.array'), args, []))
     else:
         out.append(args[0])
 
