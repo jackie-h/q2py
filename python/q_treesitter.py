@@ -79,7 +79,10 @@ def convert_operator(node: Node, tail, out: deque, named: dict):
     elif node.text == b',':
         #join
         #todo - replace with something like itertools.chain
-        convert_bin_op(Add(), tail, out, named)
+        if len(out) > 0:
+            convert_bin_op(Add(), tail, out, named)
+        else:
+            error('failed to convert ,', out)
     elif node.text == b'!': #dictionary
         keys = []
         while len(out) > 0:
