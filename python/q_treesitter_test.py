@@ -4,7 +4,7 @@ from python.q_treesitter import get_parser, parse_and_transpile, parse_and_trans
 from astunparse import unparse
 
 
-class TestStringMethods(unittest.TestCase):
+class TestQ2Py(unittest.TestCase):
 
     def test_comment(self):
         self.assertEqual(self.parse('/ a comment'), '\n')
@@ -58,6 +58,9 @@ class TestStringMethods(unittest.TestCase):
 
     def test_dictionary(self):
         self.assertEqual(self.parse('10 20 30!1.1 2.2 3.3'),'{1.1: 10, 2.2: 20, 3.3: 30}\n')
+
+    def test_variable(self):
+        self.assertEqual(self.parse('p: 10000'), '\np = 10000\n')
 
     def test_test(self):
         self.assertEqual(self.parse_file("../q/testExample.q"), '''

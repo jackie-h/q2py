@@ -1,7 +1,7 @@
 import ast
 import typing
 from _ast import Add, BinOp, Constant, FunctionDef, Call, Name, Module, ClassDef, arguments, arg, Attribute, Dict, \
-    operator, Sub, Mult, Div, And, Or, boolop, BoolOp, For, Tuple
+    operator, Sub, Mult, Div, And, Or, boolop, BoolOp, For, Tuple, Assign
 from pathlib import Path
 
 from tree_sitter import Language, Parser, Node
@@ -135,8 +135,10 @@ def convert_local_var(node: Node, tail, out: deque, named: dict):
         func = FunctionDef(var_name.id, [], body=exprs, decorator_list=[], lineno=0)
         out.append(func)
         parent[var_name.id] = func
+    elif len(out) == 1:
+        out.append(Assign([var_name], out.pop()))
     else:
-        error('local var type unknown')
+        error('local var multiple assign')
 
 
 def convert_function_call(node: Node, tail, out: deque, named: dict):
