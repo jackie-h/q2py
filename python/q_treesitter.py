@@ -65,7 +65,8 @@ def convert_operator(node: Node, tail, out: deque, named: dict):
     elif node.text == b'|':
         convert_bool_op(Or(), tail, out, named)
     elif node.text == b',':
-        #append/combine
+        #join
+        #todo - replace with something like itertools.chain
         convert_bin_op(Add(), tail, out, named)
     elif node.text == b'!': #dictionary
         keys = []
