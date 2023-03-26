@@ -1,7 +1,7 @@
 import ast
 import typing
 from _ast import Add, BinOp, Constant, FunctionDef, Call, Name, Module, ClassDef, arguments, arg, Attribute, Dict, \
-    operator, Sub, Mult, Div, And, Or, boolop, BoolOp, For, Tuple, Assign
+    operator, Sub, Mult, Div, And, Or, boolop, BoolOp, For, Tuple, Assign, Raise
 from pathlib import Path
 
 from tree_sitter import Language, Parser, Node
@@ -80,17 +80,20 @@ def convert_operator(node: Node, tail, out: deque, named: dict):
             values.append(out.pop())
         op = Dict(keys, values)
         out.append(op)
-    elif node.text == b'\'': #each
+    elif node.text == b'\'': #each or signal an error
         lhs_args = []
         while len(out) > 0:
             lhs_args.append(out.pop())
-        each_op = tail.pop()
-        while len(tail) > 0:
-            transpile(tail.pop(), tail, out, named)
-        rhs_args = []
-        while len(out) > 0:
-            rhs_args.append(out.pop())
-        out.append(Call(Name('numpy.add'), [lhs_args,rhs_args], []))
+        if len(tail) > 0: #this is an each and we have an operator
+            each_op = tail.pop()
+            while len(tail) > 0:
+                transpile(tail.pop(), tail, out, named)
+            rhs_args = []
+            while len(out) > 0:
+                rhs_args.append(out.pop())
+            out.append(Call(Name('numpy.add'), [lhs_args,rhs_args], []))
+        else: #this is a signal (exception)
+            out.append(Raise(lhs_args, []))
     else:
         error('operator=' + node.text.decode('utf-8'), out)
 

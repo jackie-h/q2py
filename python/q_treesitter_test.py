@@ -56,6 +56,9 @@ class TestQ2Py(unittest.TestCase):
         self.assertEqual(self.parse('("abc"; "uv"),\'("de"; "xyz")'),
                          "numpy.add(numpy.array('de', 'xyz'), numpy.array('abc', 'uv'))\n")
 
+    def test_signal_error(self):
+        self.assertEqual(self.parse('\'"abc"'), "\nraise 'abc'\n")
+
     def test_dictionary(self):
         self.assertEqual(self.parse('10 20 30!1.1 2.2 3.3'),'{1.1: 10, 2.2: 20, 3.3: 30}\n')
 
