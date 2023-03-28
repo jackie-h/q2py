@@ -124,7 +124,10 @@ def convert_operator(node: Node, tail, out: deque, named: dict):
             lhs = Call(Name('numpy.array'), lhs_args, [])
         elif len(lhs_args) == 1:
             lhs = lhs_args[0]
-        out.append(Subscript(lhs,Slice([],rhs_args,[])))
+        if lhs is None:
+            error('subscript with no lhs', out)
+        else:
+            out.append(Subscript(lhs,Slice([],rhs_args,[])))
     else:
         error('operator=' + node.text.decode('utf-8'), out)
 
