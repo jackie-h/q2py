@@ -129,7 +129,7 @@ def convert_operator(node: Node, tail, out: deque, named: dict):
         else:
             out.append(Subscript(lhs,Slice([],rhs_args,[])))
     else:
-        error('operator=' + node.text.decode('utf-8'), out)
+        error('operator is ' + node.text.decode('utf-8'), out)
 
 
 def convert_bin_op(op: operator, tail, out: deque, named: dict):
