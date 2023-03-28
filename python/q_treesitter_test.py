@@ -32,6 +32,7 @@ class TestQ2Py(unittest.TestCase):
 
     def test_symbol_with_namespace(self):
         self.assertEqual(self.parse('`.x.y'), 'x.y\n')
+        self.assertEqual(self.parse('`.x.y.z'), 'x.y.z\n')
 
     def test_list(self):
         self.assertEqual(self.parse('(1;2;3)'), 'numpy.array(1, 2, 3)\n')

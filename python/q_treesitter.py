@@ -243,14 +243,21 @@ def convert_symbol(node: Node, tail, out: deque, named: dict):
         out.append(name)
     if len(out) == 0:
         out.append(Constant(None, ""))
-    if len(out) == 1:
+    elif len(out) == 1:
         return
-    elif len(out) == 2:
-        val = out.pop()
+    elif len(out) > 1:
+        attrs = []
+        while len(out) > 1:
+            attrs.append(out.pop())
         name = out.pop()
-        out.append(Attribute(name,attr=val.id))
+        val = attrs.pop()
+        attr = Attribute(name,attr=val.id)
+        while len(attrs) > 0:
+            val = attrs.pop()
+            attr = Attribute(attr,attr=val.id)
+        out.append(attr)
     else:
-        error('symbol namespace larger than 2 ' + symbol_name, out)
+        error('symbol namespace not processed ' + symbol_name, out)
 
 def transpile(node: Node, tail, out: deque, named: dict):
     if node.type == "source_file":
