@@ -6,6 +6,11 @@ from astunparse import unparse
 
 class TestQ2Py(unittest.TestCase):
 
+    def test_parse_error(self):
+        with self.assertRaises(NotImplementedError) as cm:
+            self.parse(':0p')
+        self.assertEqual(cm.exception.args[0], 'Parse ERROR for node start:(0, 0) end:(0, 1) :')
+
     def test_comment(self):
         self.assertEqual(self.parse('/ a comment'), '\n')
 

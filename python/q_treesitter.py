@@ -311,6 +311,8 @@ def transpile(node: Node, tail, out: deque, named: dict):
         None
     elif node.type == ")":
         None
+    elif node.type == "ERROR":
+        error("Parse ERROR for node start:" + str(node.start_point) + " end:" + str(node.end_point) + " " + node.text.decode('utf-8'), out)
     else:
         error(node.type, out)
     return out
