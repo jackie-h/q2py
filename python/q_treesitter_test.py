@@ -29,6 +29,9 @@ class TestQ2Py(unittest.TestCase):
         self.assertEqual(self.parse('1b'), 'True\n')
         self.assertEqual(self.parse('0b'), 'False\n')
 
+    def test_timestamp(self):
+        self.assertEqual(self.parse('0p'), 'datetime.datetime(2000, 1, 1, 7, 0)\n')
+
     def test_symbol(self):
         self.assertEqual(self.parse('`x'), 'x\n')
 

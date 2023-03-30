@@ -2,6 +2,7 @@ import ast
 import typing
 from _ast import Add, BinOp, Constant, FunctionDef, Call, Name, Module, ClassDef, arguments, arg, Attribute, Dict, \
     operator, Sub, Mult, Div, And, Or, boolop, BoolOp, For, Tuple, Assign, Raise, Subscript, Slice, Compare, cmpop, Eq
+from datetime import datetime
 from pathlib import Path
 
 from tree_sitter import Language, Parser, Node
@@ -62,6 +63,17 @@ def convert_boolean(node: Node, tail, out: deque):
         out.append(Constant(False, ""))
     else:
         error(node.type, out)
+
+def convert_timestamp(node: Node, tail, out: deque):
+    val = node.text.decode('utf-8')
+    #todo - Should this use numpy.datetime64 instead ?
+    if val.endswith('p'):
+        val = val[:len(val)-1]
+        t = int(val)
+        t2000 = t + 946728000
+        out.append(Constant(datetime.fromtimestamp(t2000), ""))
+    else:
+        out.append(Constant(datetime.fromtimestamp(val), ""))
 
 def convert_operator(node: Node, tail, out: deque, named: dict):
     if node.text == b'+':
@@ -277,6 +289,8 @@ def transpile(node: Node, tail, out: deque, named: dict):
         convert_string(node, [], out)
     elif node.type == "boolean":
         convert_boolean(node, [], out)
+    elif node.type == "timestamp":
+        convert_timestamp(node, [], out)
     elif node.type == "operator":
         convert_operator(node, tail, out, named)
     elif node.type == "variable_assign":
