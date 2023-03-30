@@ -204,8 +204,14 @@ def convert_local_var(node: Node, tail, out: deque, named: dict):
         parent[var_name.id] = func
     elif len(out) == 1:
         out.append(Assign([var_name], out.pop()))
+    elif len(out) > 1:
+        args = []
+        while len(out) > 0:
+            args.append(out.pop())
+        rhs = Call(Name('numpy.array'), args, [])
+        out.append(Assign([var_name],rhs))
     else:
-        error('local var multiple assign', out)
+        error('local var assign no rhs', out)
 
 
 def convert_function_call(node: Node, tail, out: deque, named: dict):
