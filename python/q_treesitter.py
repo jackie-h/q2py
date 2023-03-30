@@ -1,7 +1,8 @@
 import ast
 import typing
 from _ast import Add, BinOp, Constant, FunctionDef, Call, Name, Module, ClassDef, arguments, arg, Attribute, Dict, \
-    operator, Sub, Mult, Div, And, Or, boolop, BoolOp, For, Tuple, Assign, Raise, Subscript, Slice, Compare, cmpop, Eq
+    operator, Sub, Mult, Div, And, Or, boolop, BoolOp, For, Tuple, Assign, Raise, Subscript, Slice, Compare, cmpop, Eq, \
+    Gt, Lt, LtE, GtE, NotEq
 from datetime import datetime
 from pathlib import Path
 
@@ -86,6 +87,16 @@ def convert_operator(node: Node, tail, out: deque, named: dict):
         convert_bin_op(Div(), tail, out, named)
     elif node.text == b'=':
         convert_compare_op(Eq(), tail, out, named)
+    elif node.text == b'<>':
+        convert_compare_op(NotEq(), tail, out, named)
+    elif node.text == b'>':
+        convert_compare_op(Gt(), tail, out, named)
+    elif node.text == b'<':
+        convert_compare_op(Lt(), tail, out, named)
+    elif node.text == b'>=':
+        convert_compare_op(GtE(), tail, out, named)
+    elif node.text == b'<=':
+        convert_compare_op(LtE(), tail, out, named)
     elif node.text == b'&':
         convert_bool_op(And(), tail, out, named)
     elif node.text == b'|':
@@ -159,9 +170,9 @@ def convert_bool_op(op: boolop, tail, out: deque, named: dict):
     out.append(opn)
 
 def convert_compare_op(op: cmpop, tail, out: deque, named: dict):
-    lhs = out.pop()
-    transpile(tail.pop(), tail, out, named)
     rhs = out.pop()
+    transpile(tail.pop(), tail, out, named)
+    lhs = out.pop()
     opn = Compare(lhs, [op], [rhs])
     out.append(opn)
 

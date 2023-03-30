@@ -67,7 +67,22 @@ class TestQ2Py(unittest.TestCase):
         self.assertEqual(self.parse('1|2'), '(2 or 1)\n')
 
     def test_op_equal(self):
-        self.assertEqual(self.parse('1=2'), '(2 == 1)\n')
+        self.assertEqual(self.parse('1=2'), '(1 == 2)\n')
+
+    def test_op_not_equal(self):
+        self.assertEqual(self.parse('1<>2'), '(1 != 2)\n')
+
+    def test_op_gt(self):
+        self.assertEqual(self.parse('1>2'), '(1 > 2)\n')
+
+    def test_op_lt(self):
+        self.assertEqual(self.parse('1<2'), '(1 < 2)\n')
+
+    def test_op_gte(self):
+        self.assertEqual(self.parse('1>=2'), '(1 >= 2)\n')
+
+    def test_op_lte(self):
+        self.assertEqual(self.parse('1<=2'), '(1 <= 2)\n')
 
     def test_op_join(self):
         self.assertEqual(self.parse('"abc", "de"'), '(\'de\' + \'abc\')\n')
