@@ -107,6 +107,9 @@ class TestQ2Py(unittest.TestCase):
     def test_variable_multiple_values(self):
         self.assertEqual(self.parse('p:0 10 5'), '\np = numpy.array(0, 10, 5)\n')
 
+    def test_variable_multiple_symbols(self):
+        self.assertEqual(self.parse('n:`x`y`x'), '\nn = numpy.array(x, y, x)\n')
+
     #def test_table(self):
     #    self.assertEqual(self.parse('t:([]n:`x`y`x`z`z`y;p:0 15 12 20 25 14)'), '\n')
     #t:([]n:`x`y`x`z`z`y;p:0 15 12 20 25 14)
@@ -129,7 +132,7 @@ import unittest
 
 class TestMocks(unittest.TestCase):
 
-    def test_mocks(self):MOCK(e.DEBUG, False)MOCK(e.ENV.utest)MOCK(get(s.doX, z), x, y, z)MOCK(s.assertOk, True)
+    def test_mocks(self):MOCK(e.DEBUG, False)MOCK(e.ENV, utest)MOCK(get(s.doX, z), x, y, z)MOCK(s.assertOk, True)
 if (__name__ == '__main__'):
     unittest.main()
 ''')

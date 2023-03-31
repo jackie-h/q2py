@@ -180,15 +180,24 @@ def convert_local_var(node: Node, tail, out: deque, named: dict):
     assert node.child_count == 3
     names = deque()
     transpile(node.children[0], tail, names, named)
-    names.reverse()
     parent = named
-    while len(names) > 1:
-        name = names.pop().id
+    name_node = names.pop()
+    f_name = None
+    namespace = None
+
+    while isinstance(name_node,Attribute):
+        if f_name is None:
+            f_name = name_node.attr
+            namespace = name_node.value.id
+        name = name_node.value.id
+        name_node = name_node.value
         if name not in parent:
             parent[name] = {}
         parent = named[name]
 
-    var_name: Name = names.pop()
+    if f_name is None:
+        f_name = name_node.id
+
     transpile(node.children[2], tail, out, named)
     if node.children[2].type == "function_body":
         exprs = []
@@ -199,17 +208,18 @@ def convert_local_var(node: Node, tail, out: deque, named: dict):
                     exprs.append(val.pop())
             else:
                 exprs.append(val)
-        func = FunctionDef(var_name.id, [], body=exprs, decorator_list=[], lineno=0)
+
+        func = FunctionDef(f_name, [], body=exprs, decorator_list=[], lineno=0)
         out.append(func)
-        parent[var_name.id] = func
+        parent[namespace] = func
     elif len(out) == 1:
-        out.append(Assign([var_name], out.pop()))
+        out.append(Assign([name_node], out.pop()))
     elif len(out) > 1:
         args = []
         while len(out) > 0:
             args.append(out.pop())
         rhs = Call(Name('numpy.array'), args, [])
-        out.append(Assign([var_name],rhs))
+        out.append(Assign([name_node],rhs))
     else:
         error('local var assign no rhs', out)
 
@@ -243,6 +253,16 @@ def convert_namespace(node: Node, tail, out: deque, named: dict):
     assert len(out) == 0
     for child in node.children:
         transpile(child, tail, out, named)
+    attrs = []
+    while len(out) > 1:
+        attrs.append(out.pop())
+    name = out.pop()
+    val = attrs.pop()
+    attr = Attribute(name, attr=val.id)
+    while len(attrs) > 0:
+        val = attrs.pop()
+        attr = Attribute(attr, attr=val.id)
+    out.append(attr)
 
 
 def convert_entity_name(node: Node, tail, out: deque):
@@ -270,23 +290,9 @@ def convert_symbol(node: Node, tail, out: deque, named: dict):
         symbol_name = symbol_name[len("`"):]
         name = Name(symbol_name)
         out.append(name)
+
     if len(out) == 0:
         out.append(Constant(None, ""))
-    elif len(out) == 1:
-        return
-    elif len(out) > 1:
-        attrs = []
-        while len(out) > 1:
-            attrs.append(out.pop())
-        name = out.pop()
-        val = attrs.pop()
-        attr = Attribute(name,attr=val.id)
-        while len(attrs) > 0:
-            val = attrs.pop()
-            attr = Attribute(attr,attr=val.id)
-        out.append(attr)
-    else:
-        error('symbol namespace not processed ' + symbol_name, out)
 
 def transpile(node: Node, tail, out: deque, named: dict):
     if node.type == "source_file":
