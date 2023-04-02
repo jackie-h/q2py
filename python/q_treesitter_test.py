@@ -110,9 +110,8 @@ class TestQ2Py(unittest.TestCase):
     def test_variable_multiple_symbols(self):
         self.assertEqual(self.parse('n:`x`y`x'), '\nn = numpy.array(x, y, x)\n')
 
-    #def test_table(self):
-    #    self.assertEqual(self.parse('t:([]n:`x`y`x`z`z`y;p:0 15 12 20 25 14)'), '\n')
-    #t:([]n:`x`y`x`z`z`y;p:0 15 12 20 25 14)
+    def test_table(self):
+        self.assertEqual(self.parse('t:([]n:`x`y`x`z`z`y;p:0 15 12 20 25 14)'), '\nt = numpy.array({n: [x, y, x, z, z, y]}, {p: [0, 15, 12, 20, 25, 14]})\n')
     #?[t;();0b;()]
 
     def test_test(self):

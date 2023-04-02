@@ -2,7 +2,7 @@ import ast
 import typing
 from _ast import Add, BinOp, Constant, FunctionDef, Call, Name, Module, ClassDef, arguments, arg, Attribute, Dict, \
     operator, Sub, Mult, Div, And, Or, boolop, BoolOp, For, Tuple, Assign, Raise, Subscript, Slice, Compare, cmpop, Eq, \
-    Gt, Lt, LtE, GtE, NotEq
+    Gt, Lt, LtE, GtE, NotEq, List
 from datetime import datetime
 from pathlib import Path
 
@@ -275,6 +275,23 @@ def convert_index(node: Node, tail, out: deque, named: dict):
         transpile(child, tail, out, named)
 
 
+def convert_table(node: Node, tail, out: deque, named: dict):
+    inits = []
+    for child in node.children:
+        if child.type == 'variable_assign':
+            column_name = child.children[0]
+            transpile(column_name, tail, out, named)
+            keys = [ out.pop() ]
+            value_node = child.children[2]
+            transpile(value_node, tail, out, named)
+            values = []
+            while len(out) > 0:
+                values.append(out.pop())
+            op = Dict(keys, [List(values)])
+            inits.append(op)
+    out.append(Call(Name('numpy.array'), inits, []))
+
+
 def convert_list(node: Node, tail, out: deque, named: dict):
     for child in node.children:
         transpile(child, tail, out, named)
@@ -330,6 +347,8 @@ def transpile(node: Node, tail, out: deque, named: dict):
         convert_entity_name(node, tail, out)
     elif node.type == "index":
         convert_index(node, tail, out, named)
+    elif node.type == "table":
+        convert_table(node, tail, out, named)
     elif node.type == "list":
         convert_list(node, tail, out, named)
     elif node.type == "symbol":
