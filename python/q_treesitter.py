@@ -2,7 +2,7 @@ import ast
 import typing
 from _ast import Add, BinOp, Constant, FunctionDef, Call, Name, Module, ClassDef, arguments, arg, Attribute, Dict, \
     operator, Sub, Mult, Div, And, Or, boolop, BoolOp, For, Tuple, Assign, Raise, Subscript, Slice, Compare, cmpop, Eq, \
-    Gt, Lt, LtE, GtE, NotEq, List
+    Gt, Lt, LtE, GtE, NotEq, List, IfExp
 from datetime import datetime
 from pathlib import Path
 
@@ -311,6 +311,21 @@ def convert_symbol(node: Node, tail, out: deque, named: dict):
     if len(out) == 0:
         out.append(Constant(None, ""))
 
+def convert_if(node: Node, tail, out: deque, named: dict):
+    vals = []
+    for child in node.children:
+        if child.text == b';':
+            while len(out) > 0:
+                vals.append(out.pop())
+        elif child.text != b'$[':
+            transpile(child, tail, out, named)
+    while len(out) > 0:
+        vals.append(out.pop())
+    if len(vals) == 3:
+        out.append(IfExp(vals[0], vals[1], vals[2]))
+    else:
+        error('Unsupported if', out)
+
 def transpile(node: Node, tail, out: deque, named: dict):
     if node.type == "source_file":
         for child in node.children:
@@ -353,6 +368,8 @@ def transpile(node: Node, tail, out: deque, named: dict):
         convert_list(node, tail, out, named)
     elif node.type == "symbol":
         convert_symbol(node, tail, out, named)
+    elif node.type == "if_else":
+        convert_if(node, tail, out, named)
     elif node.type == "comment":
         None
     elif node.type == ";":

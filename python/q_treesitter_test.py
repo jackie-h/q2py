@@ -114,6 +114,12 @@ class TestQ2Py(unittest.TestCase):
         self.assertEqual(self.parse('t:([]n:`x`y`x`z`z`y;p:0 15 12 20 25 14)'), '\nt = numpy.array({n: [x, y, x, z, z, y]}, {p: [0, 15, 12, 20, 25, 14]})\n')
     #?[t;();0b;()]
 
+    def test_if_else(self):
+        self.assertEqual(self.parse('$[a > 10;a:20;r: "true"]'), '''(
+a = 20 if (a > 10) else 
+r = 'true')
+''')
+
     def test_test(self):
         self.assertEqual(self.parse_file("../q/testExample.q"), '''
 import unittest
