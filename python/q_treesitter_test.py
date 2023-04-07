@@ -121,16 +121,28 @@ class TestQ2Py(unittest.TestCase):
     #?[t;();0b;()]
 
     def test_if_else_dollar(self):
-        self.assertEqual(self.parse('$[a > 10;a:20;r: "true"]'), '''(
-a = 20 if (a > 10) else 
-r = 'true')
+        self.assertEqual(self.parse('$[a > 10;a:20;r: "true"]'), '''
+if (a > 10):
+    a = 20
+else:
+    r = 'true'
 ''')
 
     def test_if_else(self):
-            self.assertEqual(self.parse('if[a > 10;a:20;r: "true"]'), '''(
-a = 20 if (a > 10) else 
-r = 'true')
+            self.assertEqual(self.parse('if[a > 10;a:20;r: "true"]'), '''
+if (a > 10):
+    a = 20
+else:
+    r = 'true'
 ''')
+
+    def test_if_elif(self):
+        self.assertEqual(self.parse('$[a>2;2;a>5;5;1]'), '''
+if (a > 2):2
+elif (a > 5):5
+else:1
+''')
+
     def test_cast(self):
         self.assertEqual(self.parse('`date$0p'), 'date(datetime.datetime(2000, 1, 1, 7, 0))\n')
 

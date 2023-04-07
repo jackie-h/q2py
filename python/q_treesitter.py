@@ -2,7 +2,7 @@ import ast
 import typing
 from _ast import Add, BinOp, Constant, FunctionDef, Call, Name, Module, ClassDef, arguments, arg, Attribute, Dict, \
     operator, Sub, Mult, Div, And, Or, boolop, BoolOp, For, Tuple, Assign, Raise, Subscript, Slice, Compare, cmpop, Eq, \
-    Gt, Lt, LtE, GtE, NotEq, List, IfExp, Return
+    Gt, Lt, LtE, GtE, NotEq, List, IfExp, Return, If
 from datetime import datetime
 from pathlib import Path
 
@@ -374,7 +374,9 @@ def convert_if(node: Node, tail, out: deque, named: dict):
     while len(out) > 0:
         vals.append(out.pop())
     if len(vals) == 3:
-        out.append(IfExp(vals[0], vals[1], vals[2]))
+        out.append(If(vals[0], [vals[1]], [vals[2]]))
+    elif len(vals) == 5:
+        out.append(If(vals[0], [vals[1]], [If(vals[2], [vals[3]], [vals[4]])]))
     else:
         error('Unsupported if', out)
 
