@@ -122,6 +122,8 @@ class TestQ2Py(unittest.TestCase):
 a = 20 if (a > 10) else 
 r = 'true')
 ''')
+    def test_cast(self):
+        self.assertEqual(self.parse('`date$0p'), 'date(datetime.datetime(2000, 1, 1, 7, 0))\n')
 
     def test_test(self):
         self.assertEqual(self.parse_file("../q/testExample.q"), '''

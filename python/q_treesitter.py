@@ -342,6 +342,12 @@ def convert_if(node: Node, tail, out: deque, named: dict):
     else:
         error('Unsupported if', out)
 
+def convert_cast(node: Node, tail, out: deque, named: dict):
+    rhs = out.pop()
+    assert node.child_count == 2
+    transpile(node.children[0], tail, out, named)
+    out.append(Call(out.pop(), [rhs], []))
+
 def transpile(node: Node, tail, out: deque, named: dict):
     if node.type == "source_file":
         for child in node.children:
@@ -386,6 +392,8 @@ def transpile(node: Node, tail, out: deque, named: dict):
         convert_symbol(node, tail, out, named)
     elif node.type == "if_else":
         convert_if(node, tail, out, named)
+    elif node.type == "cast":
+        convert_cast(node, tail, out, named)
     elif node.type == "comment":
         None
     elif node.type == ";":
