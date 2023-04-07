@@ -217,8 +217,9 @@ def convert_local_var(node: Node, tail, out: deque, named: dict):
     if f_name is None:
         f_name = name_node.id
 
-    transpile(node.children[2], tail, out, named)
-    if node.children[2].type == "function_body":
+    rhs = node.children[2]
+    transpile(rhs, tail, out, named)
+    if rhs.type == "expr_list" and rhs.children[0].type == "function_body":
         exprs = []
         while len(out) > 0:
             val = out.pop()
