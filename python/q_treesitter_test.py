@@ -8,8 +8,8 @@ class TestQ2Py(unittest.TestCase):
 
     def test_parse_error(self):
         with self.assertRaises(NotImplementedError) as cm:
-            self.parse(':0p')
-        self.assertEqual(cm.exception.args[0], 'Parse ERROR for node start:(0, 0) end:(0, 1) :')
+            self.parse('}')
+        self.assertEqual(cm.exception.args[0], 'Parse ERROR for node start:(0, 0) end:(0, 1) }')
 
     def test_comment(self):
         self.assertEqual(self.parse('/ a comment'), '\n')
@@ -103,6 +103,9 @@ class TestQ2Py(unittest.TestCase):
 
     def test_variable(self):
         self.assertEqual(self.parse('p: 10000'), '\np = 10000\n')
+
+    def test_variable_namespace(self):
+        self.assertEqual(self.parse('.a.b.c.d: 10000'), '\na.b.c.d = 10000\n')
 
     def test_variable_multiple_values(self):
         self.assertEqual(self.parse('p:0 10 5'), '\np = numpy.array(0, 10, 5)\n')

@@ -180,20 +180,33 @@ def convert_local_var(node: Node, tail, out: deque, named: dict):
     assert node.child_count == 3
     names = deque()
     transpile(node.children[0], tail, names, named)
-    parent = named
     name_node = names.pop()
+    parent_node = name_node
     f_name = None
-    namespace = None
+    namespace = []
 
-    while isinstance(name_node,Attribute):
+    while isinstance(parent_node,Attribute):
         if f_name is None:
-            f_name = name_node.attr
-            namespace = name_node.value.id
-        name = name_node.value.id
-        name_node = name_node.value
-        if name not in parent:
-            parent[name] = {}
+            f_name = parent_node.attr
+        else:
+            namespace.append(parent_node.attr)
+        parent_node = parent_node.value
+
+    if isinstance(parent_node, Name):
+        namespace.append(parent_node.id)
+
+    parent = {}
+    if len(namespace) > 0:
+        name = namespace.pop()
+        if name not in named:
+            named[name] = {}
         parent = named[name]
+
+        while len(namespace) > 0:
+            name = namespace.pop()
+            if name not in parent:
+                parent[name] = {}
+            parent = parent[name]
 
     if f_name is None:
         f_name = name_node.id
@@ -212,14 +225,17 @@ def convert_local_var(node: Node, tail, out: deque, named: dict):
         func = FunctionDef(f_name, [], body=exprs, decorator_list=[], lineno=0)
         out.append(func)
         parent[f_name] = func
-    elif len(out) == 1:
-        out.append(Assign([name_node], out.pop()))
-    elif len(out) > 1:
-        args = []
-        while len(out) > 0:
-            args.append(out.pop())
-        rhs = Call(Name('numpy.array'), args, [])
-        out.append(Assign([name_node],rhs))
+    elif len(out) >= 1:
+        if len(out) > 1:
+            args = []
+            while len(out) > 0:
+                args.append(out.pop())
+            rhs = Call(Name('numpy.array'), args, [])
+        else:
+            rhs = out.pop()
+        assign = Assign([name_node], rhs)
+        parent[f_name] = assign
+        out.append(assign)
     else:
         error('local var assign no rhs', out)
 
@@ -442,7 +458,7 @@ def parse_and_transpile(parser:Parser, text:str, module_name:str) -> Module:
         return mod
     else:
         out_nodes = []
-        if len(out) > 0:
+        while len(out) > 0:
             out_nodes.append(out.pop())
         mod = Module(out_nodes,[])
         return mod
