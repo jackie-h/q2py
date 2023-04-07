@@ -373,10 +373,13 @@ def convert_if(node: Node, tail, out: deque, named: dict):
             transpile(child, tail, out, named)
     while len(out) > 0:
         vals.append(out.pop())
-    if len(vals) == 3:
-        out.append(If(vals[0], [vals[1]], [vals[2]]))
-    elif len(vals) == 5:
-        out.append(If(vals[0], [vals[1]], [If(vals[2], [vals[3]], [vals[4]])]))
+    if len(vals) >= 3 and len(vals) % 2 != 0: #odd number of args
+        while len(vals) >= 3:
+            arg3 = vals.pop()
+            arg2 = vals.pop()
+            arg1 = vals.pop()
+            vals.append(If(arg1, [arg2], [arg3]))
+        out.append(vals.pop())
     else:
         error('Unsupported if', out)
 
