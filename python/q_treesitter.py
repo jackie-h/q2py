@@ -41,6 +41,12 @@ def convert_int(node: Node, tail, out: deque):
         val = val[:len(val)-1]
     out.append(Constant(int(val), ""))
 
+def convert_short(node: Node, tail, out: deque):
+    val:str = node.text.decode('utf-8')
+    if val.endswith('h'):
+        val = val[:len(val)-1]
+    out.append(Call(Name('numpy.short'), [Constant(int(val), "")], []))
+
 def convert_float(node: Node, tail, out: deque):
     val:str = node.text.decode('utf-8')
     if val.endswith('f'):
@@ -360,6 +366,8 @@ def transpile(node: Node, tail, out: deque, named: dict):
         convert_long(node, [], out)
     elif node.type == "int":
         convert_int(node, [], out)
+    elif node.type == "short":
+        convert_short(node, [], out)
     elif node.type == "float":
         convert_float(node, [], out)
     elif node.type == "string":

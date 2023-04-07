@@ -21,6 +21,9 @@ class TestQ2Py(unittest.TestCase):
     def test_int(self):
         self.assertEqual(self.parse('2i'), '2\n')
 
+    def test_short(self):
+        self.assertEqual(self.parse('2h'), 'numpy.short(2)\n')
+
     def test_float(self):
         self.assertEqual(self.parse('1.2'), '1.2\n')
         self.assertEqual(self.parse('1f'), '1.0\n')
