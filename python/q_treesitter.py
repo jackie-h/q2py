@@ -162,23 +162,47 @@ def convert_operator(node: Node, tail, out: deque, named: dict):
 
 
 def convert_bin_op(op: operator, tail, out: deque, named: dict):
-    lhs = out.pop()
+    if len(out) > 0:
+        lhs = out.pop()
+    else:
+        lhs = None
+        error('No lhs for bin op', out)
     transpile(tail.pop(), tail, out, named)
-    rhs = out.pop()
+    if len(out) > 0:
+        rhs = out.pop()
+    else:
+        rhs = None
+        error('No rhs for bin op', out)
     opn = BinOp(lhs, op, rhs)
     out.append(opn)
 
 def convert_bool_op(op: boolop, tail, out: deque, named: dict):
-    lhs = out.pop()
+    if len(out) > 0:
+        lhs = out.pop()
+    else:
+        lhs = None
+        error('No lhs for bool op', out)
     transpile(tail.pop(), tail, out, named)
-    rhs = out.pop()
+    if len(out) > 0:
+        rhs = out.pop()
+    else:
+        rhs = None
+        error('No rhs for bool op', out)
     opn = BoolOp(op, [lhs,rhs])
     out.append(opn)
 
 def convert_compare_op(op: cmpop, tail, out: deque, named: dict):
-    rhs = out.pop()
+    if len(out) > 0:
+        rhs = out.pop()
+    else:
+        rhs = None
+        error('No rhs for compare op', out)
     transpile(tail.pop(), tail, out, named)
-    lhs = out.pop()
+    if len(out) > 0:
+        lhs = out.pop()
+    else:
+        lhs = None
+        error('No lhs for compare op', out)
     opn = Compare(lhs, [op], [rhs])
     out.append(opn)
 
