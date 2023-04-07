@@ -2,7 +2,7 @@ import ast
 import typing
 from _ast import Add, BinOp, Constant, FunctionDef, Call, Name, Module, ClassDef, arguments, arg, Attribute, Dict, \
     operator, Sub, Mult, Div, And, Or, boolop, BoolOp, For, Tuple, Assign, Raise, Subscript, Slice, Compare, cmpop, Eq, \
-    Gt, Lt, LtE, GtE, NotEq, List, IfExp, Return, If
+    Gt, Lt, LtE, GtE, NotEq, List, IfExp, Return, If, Expression, Expr
 from datetime import datetime
 from pathlib import Path
 
@@ -302,13 +302,13 @@ def convert_function_body(node: Node, tail, out: deque, named: dict):
 
 
 def convert_namespace(node: Node, tail, out: deque, named: dict):
-    assert len(out) == 0
+    nsp_out = deque()
     for child in node.children:
-        transpile(child, tail, out, named)
+        transpile(child, tail, nsp_out, named)
     attrs = []
-    while len(out) > 1:
-        attrs.append(out.pop())
-    name = out.pop()
+    while len(nsp_out) > 1:
+        attrs.append(nsp_out.pop())
+    name = nsp_out.pop()
     val = attrs.pop()
     attr = Attribute(name, attr=val.id)
     while len(attrs) > 0:
@@ -391,8 +391,14 @@ def convert_cast(node: Node, tail, out: deque, named: dict):
 
 def transpile(node: Node, tail, out: deque, named: dict):
     if node.type == "source_file":
+        c_out = deque()
         for child in node.children:
-            transpile(child, [], out, named)
+            transpile(child, [], c_out, named)
+        while len(c_out) > 0:
+            nd = c_out.pop()
+            if not isinstance(nd,FunctionDef) and not isinstance(nd,Assign):
+                nd = Expr(nd)
+            out.append(nd)
     elif node.type == "expr_list":
         convert_expr_list(node, tail, out, named)
     elif node.type == "expr_seq":
