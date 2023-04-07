@@ -2,7 +2,7 @@ import ast
 import typing
 from _ast import Add, BinOp, Constant, FunctionDef, Call, Name, Module, ClassDef, arguments, arg, Attribute, Dict, \
     operator, Sub, Mult, Div, And, Or, boolop, BoolOp, For, Tuple, Assign, Raise, Subscript, Slice, Compare, cmpop, Eq, \
-    Gt, Lt, LtE, GtE, NotEq, List, IfExp
+    Gt, Lt, LtE, GtE, NotEq, List, IfExp, Return
 from datetime import datetime
 from pathlib import Path
 
@@ -157,6 +157,11 @@ def convert_operator(node: Node, tail, out: deque, named: dict):
             error('subscript with no lhs', out)
         else:
             out.append(Subscript(lhs,Slice([],rhs_args,[])))
+    elif node.text == b':': #Return
+        rhs_args = []
+        while len(out) > 0:
+            rhs_args.append(out.pop())
+        out.append(Return(rhs_args))
     else:
         error('operator is ' + node.text.decode('utf-8'), out)
 

@@ -134,6 +134,9 @@ r = 'true')
     def test_cast(self):
         self.assertEqual(self.parse('`date$0p'), 'date(datetime.datetime(2000, 1, 1, 7, 0))\n')
 
+    def test_return(self):
+        self.assertEqual(self.parse(':10000;'), '\nreturn 10000\n')
+
     def test_test(self):
         self.assertEqual(self.parse_file("../q/testExample.q"), '''
 import unittest
