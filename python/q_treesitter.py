@@ -211,7 +211,7 @@ def convert_local_var(node: Node, tail, out: deque, named: dict):
 
         func = FunctionDef(f_name, [], body=exprs, decorator_list=[], lineno=0)
         out.append(func)
-        parent[namespace] = func
+        parent[f_name] = func
     elif len(out) == 1:
         out.append(Assign([name_node], out.pop()))
     elif len(out) > 1:
@@ -425,6 +425,7 @@ def parse_and_transpile(parser:Parser, text:str, module_name:str) -> Module:
     if 'test' in named:
         tests: dict = named['test']
         test_funcs:typing.List[FunctionDef] = list(tests.values())
+        test_funcs.reverse()
         for test_func in test_funcs:
             test_func.args=arguments(posonlyargs=[],args=[arg(arg='self',annotation=[])],defaults=[],kwonlyargs=[],vararg=[],kwarg=[])
             for stmt in test_func.body:
