@@ -333,7 +333,7 @@ def convert_if(node: Node, tail, out: deque, named: dict):
         if child.text == b';':
             while len(out) > 0:
                 vals.append(out.pop())
-        elif child.text != b'$[':
+        elif child.text != b'$[' and child.text != b'if':
             transpile(child, tail, out, named)
     while len(out) > 0:
         vals.append(out.pop())
