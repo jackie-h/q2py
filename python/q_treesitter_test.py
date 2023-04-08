@@ -27,6 +27,7 @@ class TestQ2Py(unittest.TestCase):
     def test_float(self):
         self.assertEqual('\n1.2\n', self.parse('1.2'))
         self.assertEqual('\n1.0\n', self.parse('1f'))
+        self.assertEqual('\n0.3\n', self.parse('.3'))
 
     def test_boolean(self):
         self.assertEqual('\nTrue\n', self.parse('1b'))
