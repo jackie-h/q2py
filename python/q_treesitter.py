@@ -406,10 +406,12 @@ def convert_if(node: Node, tail, out: deque, named: dict):
         error('Unsupported if', out)
 
 def convert_cast(node: Node, tail, out: deque, named: dict):
-    rhs = out.pop()
     assert node.child_count == 2
+    rhs_args = []
+    if len(out) > 0:
+        rhs_args.append(out.pop())
     transpile(node.children[0], tail, out, named)
-    out.append(Call(out.pop(), [rhs], []))
+    out.append(Call(out.pop(), rhs_args, []))
 
 def transpile(node: Node, tail, out: deque, named: dict):
     if node.type == "source_file":
