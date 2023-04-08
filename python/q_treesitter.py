@@ -322,6 +322,10 @@ def convert_entity_name(node: Node, tail, out: deque):
     out.append(Name(node.text.decode('utf-8')))
 
 
+def convert_entity_namespace(node: Node, tail, out: deque):
+    assert node.child_count == 0
+    out.append(Name(node.text.decode('utf-8')[1:]))
+
 def convert_index(node: Node, tail, out: deque, named: dict):
     for child in node.children:
         transpile(child, tail, out, named)
@@ -431,6 +435,8 @@ def transpile(node: Node, tail, out: deque, named: dict):
         convert_namespace(node, tail, out, named)
     elif node.type == "entity_name":
         convert_entity_name(node, tail, out)
+    elif node.type == "entity_nsp":
+        convert_entity_namespace(node, tail, out)
     elif node.type == "index":
         convert_index(node, tail, out, named)
     elif node.type == "table":
