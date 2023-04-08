@@ -2,7 +2,7 @@ import ast
 import typing
 from _ast import Add, BinOp, Constant, FunctionDef, Call, Name, Module, ClassDef, arguments, arg, Attribute, Dict, \
     operator, Sub, Mult, Div, And, Or, boolop, BoolOp, For, Tuple, Assign, Raise, Subscript, Slice, Compare, cmpop, Eq, \
-    Gt, Lt, LtE, GtE, NotEq, List, IfExp, Return, If, Expression, Expr
+    Gt, Lt, LtE, GtE, NotEq, List, IfExp, Return, If, Expression, Expr, Lambda
 from datetime import datetime
 from pathlib import Path
 
@@ -249,18 +249,16 @@ def convert_local_var(node: Node, tail, out: deque, named: dict):
     rhs = node.children[2]
     transpile(rhs, tail, out, named)
     if rhs.type == "expr_list" and rhs.children[0].type == "function_definition":
-        exprs = []
-        while len(out) > 0:
+        if len(out) == 1:
             val = out.pop()
-            if isinstance(val,list):
-                while len(val) > 0:
-                    exprs.append(val.pop())
+            if isinstance(val,Lambda):
+                func = FunctionDef(f_name, val.args, body=val.body, decorator_list=[], lineno=0)
+                out.append(func)
+                parent[f_name] = func
             else:
-                exprs.append(val)
-
-        func = FunctionDef(f_name, [], body=exprs, decorator_list=[], lineno=0)
-        out.append(func)
-        parent[f_name] = func
+                error('Unexpected function def', out)
+        else:
+            error('Unexpected function def', out)
     elif len(out) >= 1:
         if len(out) > 1:
             args = []
@@ -297,8 +295,28 @@ def convert_builtin_function_call(node: Node, tail, out: deque, named: dict):
 
 
 def convert_function_definition(node: Node, tail, out: deque, named: dict):
-    assert node.child_count == 3
-    transpile(node.children[1], tail, out, named)
+    args_node = node.child_by_field_name('args')
+    fn_args = []
+    if args_node is not None:
+        arg_out = deque()
+        args = []
+        convert_index(args_node, tail, arg_out, named)
+        while len(arg_out) > 0:
+            arg_name_node = arg_out.popleft()
+            arg_name = ''
+            if isinstance(arg_name_node, Name):
+                arg_name = arg_name_node.id
+            else:
+                error('unknown func arg', out)
+            args.append(arg(arg=arg_name, annotation=[]))
+        fn_args = arguments(posonlyargs=[], args=args, defaults=[], kwonlyargs=[], vararg=[], kwarg=[])
+    body_node = node.child_by_field_name('body')
+    body_exprs = []
+    if body_node is not None:
+        transpile(body_node, tail, out, named)
+        while len(out) > 0:
+            body_exprs.append(Expr(out.pop()))
+    out.append(Lambda(fn_args,body_exprs))
 
 
 def convert_namespace(node: Node, tail, out: deque, named: dict):
@@ -511,10 +529,12 @@ def parse_and_transpile(parser:Parser, text:str, module_name:str) -> Module:
         for test_func in test_funcs:
             test_func.args=arguments(posonlyargs=[],args=[arg(arg='self',annotation=[])],defaults=[],kwonlyargs=[],vararg=[],kwarg=[])
             for stmt in test_func.body:
-                if isinstance(stmt, Call):
-                    test_fn_call:Call = stmt
-                    if isinstance(test_fn_call.func, Name) and test_fn_call.func.id == 'AEQ':
-                        test_fn_call.func = Attribute(value=Name(id='self'), attr='assertEqual')
+                if isinstance(stmt, Expr):
+                    value = stmt.value
+                    if isinstance(value, Call):
+                        test_fn_call:Call = value
+                        if isinstance(test_fn_call.func, Name) and test_fn_call.func.id == 'AEQ':
+                            test_fn_call.func = Attribute(value=Name(id='self'), attr='assertEqual')
 
         test_class_name = module_name[0].upper() + module_name[1:]
         test_class = ClassDef(test_class_name,[Name(id='unittest.TestCase')],[],test_funcs,[])

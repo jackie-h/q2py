@@ -154,6 +154,29 @@ else:1
     def test_return(self):
         self.assertEqual('\n\nreturn 10000\n', self.parse(':10000;'))
 
+    def test_function_def(self):
+        self.assertEqual('''
+
+def f():
+    (x + 2)
+''', self.parse('f:{2+x}'))
+
+    def test_function_def_with_args(self):
+        self.assertEqual('''
+
+def f(a, b, c):
+    (((c * 2) + b) + a)
+''', self.parse('f:{[a;b;c] a+b+2*c}'))
+
+    def test_function_def_multiline(self):
+        self.assertEqual('''
+
+def f():
+    
+    y = (x + 2)
+    y
+''', self.parse('f:{y:2+x;y}'))
+
     def test_namespace_mixed_with_symbol_exprs(self):
         self.assertEqual('''
 b
@@ -167,9 +190,11 @@ import unittest
 
 class TestExample(unittest.TestCase):
 
-    def test_add(self):self.assertEqual(3, (2 + 1), '1+2 should equal 3')
+    def test_add(self):
+        self.assertEqual(3, (2 + 1), '1+2 should equal 3')
 
-    def test_subtract(self):self.assertEqual(1, -1, 2, '2-1 should equal 1')
+    def test_subtract(self):
+        self.assertEqual(1, -1, 2, '2-1 should equal 1')
 if (__name__ == '__main__'):
     unittest.main()
 ''', self.parse_file("../q/testExample.q"))
@@ -180,7 +205,14 @@ import unittest
 
 class TestMocks(unittest.TestCase):
 
-    def test_mocks(self):MOCK(e.DEBUG, False)MOCK(e.ENV, utest)MOCK(get(s.doX, z), x, y, z)MOCK(s.assertOk, True)
+    def test_mocks(self):
+        MOCK(e.DEBUG, False)
+        MOCK(e.ENV, utest)
+        MOCK((lambda x, y, z: 
+        get(s.doX, z)))
+        MOCK((lambda : 
+        True
+        s.assertOk))
 if (__name__ == '__main__'):
     unittest.main()
 ''', self.parse_file("../q/testMocks.q"))
