@@ -184,6 +184,9 @@ a
 j.j
 ''', self.parse('.j.j`a`b'))
 
+    def test_sql_select(self):
+        self.assertEqual('\n\'select a,b from t\'\n', self.parse('select a,b from t;'))
+
     def test_test(self):
         self.assertEqual('''
 import unittest

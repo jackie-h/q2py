@@ -413,6 +413,10 @@ def convert_cast(node: Node, tail, out: deque, named: dict):
     transpile(node.children[0], tail, out, named)
     out.append(Call(out.pop(), rhs_args, []))
 
+def convert_q_sql_expr(node: Node, tail, out: deque, named: dict):
+    #TODO: Figure out a plan for this, perhaps pandas
+    out.append(Constant(node.text.decode('utf-8'), ""))
+
 def transpile(node: Node, tail, out: deque, named: dict):
     if node.type == "source_file":
         c_out = deque()
@@ -469,6 +473,8 @@ def transpile(node: Node, tail, out: deque, named: dict):
         convert_if(node, tail, out, named)
     elif node.type == "cast":
         convert_cast(node, tail, out, named)
+    elif node.type == "q_sql_expr":
+        convert_q_sql_expr(node, tail, out, named)
     elif node.type == "comment":
         None
     elif node.type == ";":
