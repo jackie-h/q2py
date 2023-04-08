@@ -459,6 +459,9 @@ def transpile(node: Node, tail, out: deque, named: dict):
         None
     elif node.type == "ERROR":
         error("Parse ERROR for node start:" + str(node.start_point) + " end:" + str(node.end_point) + " " + node.text.decode('utf-8'), out)
+        # if we are just logging errors try to continue
+        for child in node.children:
+            transpile(child, [], out, named)
     else:
         error(node.type, out)
     return out
