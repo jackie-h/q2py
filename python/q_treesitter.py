@@ -248,7 +248,7 @@ def convert_local_var(node: Node, tail, out: deque, named: dict):
 
     rhs = node.children[2]
     transpile(rhs, tail, out, named)
-    if rhs.type == "expr_list" and rhs.children[0].type == "function_body":
+    if rhs.type == "expr_list" and rhs.children[0].type == "function_definition":
         exprs = []
         while len(out) > 0:
             val = out.pop()
@@ -296,7 +296,7 @@ def convert_builtin_function_call(node: Node, tail, out: deque, named: dict):
     convert_function_call(node, tail, out, named)
 
 
-def convert_function_body(node: Node, tail, out: deque, named: dict):
+def convert_function_definition(node: Node, tail, out: deque, named: dict):
     assert node.child_count == 3
     transpile(node.children[1], tail, out, named)
 
@@ -425,8 +425,8 @@ def transpile(node: Node, tail, out: deque, named: dict):
         convert_operator(node, tail, out, named)
     elif node.type == "variable_assign":
         convert_local_var(node, tail, out, named)
-    elif node.type == "function_body":
-        convert_function_body(node, tail, out, named)
+    elif node.type == "function_definition":
+        convert_function_definition(node, tail, out, named)
     elif node.type == "builtin_function_call":
         convert_builtin_function_call(node, tail, out, named)
     elif node.type == "entity_with_index":
