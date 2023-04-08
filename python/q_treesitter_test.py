@@ -45,6 +45,7 @@ class TestQ2Py(unittest.TestCase):
     def test_symbol_with_namespace(self):
         self.assertEqual('\nx.y\n', self.parse('`.x.y'), )
         self.assertEqual('\nx.y.z\n', self.parse('`.x.y.z'))
+        #TODO - FIX ME - this is not a namespace but an op self.assertEqual('\nx.y\n', self.parse('`x.y'), )
 
     def test_list(self):
         self.assertEqual('\nnumpy.array(1, 2, 3)\n', self.parse('(1;2;3)'))

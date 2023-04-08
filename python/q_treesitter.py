@@ -327,12 +327,15 @@ def convert_namespace(node: Node, tail, out: deque, named: dict):
     while len(nsp_out) > 1:
         attrs.append(nsp_out.pop())
     name = nsp_out.pop()
-    val = attrs.pop()
-    attr = Attribute(name, attr=val.id)
-    while len(attrs) > 0:
+    if len(attrs) > 0:
         val = attrs.pop()
-        attr = Attribute(attr, attr=val.id)
-    out.append(attr)
+        attr = Attribute(name, attr=val.id)
+        while len(attrs) > 0:
+            val = attrs.pop()
+            attr = Attribute(attr, attr=val.id)
+        out.append(attr)
+    else:
+        error('Not a namespace', out)
 
 
 def convert_entity_name(node: Node, tail, out: deque):
