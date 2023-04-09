@@ -183,10 +183,10 @@ def convert_bin_op(op: operator, tail, out: deque, named: dict):
     out.append(opn)
 
 def convert_bool_op(op: boolop, tail, out: deque, named: dict):
-    lhs = _extract_expr_or_none(out)
+    rhs = _extract_expr_or_none(out)
     if len(tail) > 0:
         transpile(tail.pop(), tail, out, named)
-    rhs = _extract_expr_or_none(out)
+    lhs = _extract_expr_or_none(out)
     opn = BoolOp(op, [lhs,rhs])
     out.append(opn)
 

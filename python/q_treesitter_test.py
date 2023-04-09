@@ -69,10 +69,10 @@ class TestQ2Py(unittest.TestCase):
         self.assertEqual('\n(1 / 2)\n', self.parse('1%2'))
 
     def test_op_and(self):
-        self.assertEqual('\n(2 and 1)\n', self.parse('1&2'))
+        self.assertEqual('\n(1 and 2)\n', self.parse('1&2'))
 
     def test_op_or(self):
-        self.assertEqual('\n(2 or 1)\n', self.parse('1|2'))
+        self.assertEqual('\n(1 or 2)\n', self.parse('1|2'))
 
     def test_op_equal(self):
         self.assertEqual('\n(1 == 2)\n', self.parse('1=2'))
