@@ -92,6 +92,9 @@ class TestQ2Py(unittest.TestCase):
     def test_op_lte(self):
         self.assertEqual('\n(1 <= 2)\n', self.parse('1<=2'))
 
+    def test_op_match(self):
+        self.assertEqual('\n(1 == \'2\')\n', self.parse('1~"2"'))
+
     def test_op_join(self):
         self.assertEqual('\n(\'de\' + \'abc\')\n', self.parse('"abc", "de"'))
 

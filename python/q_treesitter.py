@@ -99,6 +99,8 @@ def convert_operator(node: Node, tail, out: deque, named: dict):
         convert_bin_op(Div(), tail, out, named)
     elif node.text == b'=':
         convert_compare_op(Eq(), tail, out, named)
+    elif node.text == b'~': #Match, treat as equal for now
+        convert_compare_op(Eq(), tail, out, named)
     elif node.text == b'<>':
         convert_compare_op(NotEq(), tail, out, named)
     elif node.text == b'>':
