@@ -29,6 +29,9 @@ class TestQ2Py(unittest.TestCase):
         self.assertEqual('\n1.0\n', self.parse('1f'))
         self.assertEqual('\n0.3\n', self.parse('.3'))
 
+    def test_real(self):
+        self.assertEqual('\n12340000.0\n', self.parse('1.234e7e'))
+
     def test_boolean(self):
         self.assertEqual('\nTrue\n', self.parse('1b'))
         self.assertEqual('\nFalse\n', self.parse('0b'))
