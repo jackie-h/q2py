@@ -151,13 +151,20 @@ if (a > 10):
     a = 20
 ''', self.parse('if[a > 10;a:20;]'))
 
-    def test_if_elif(self):
+    def test_if_elif_5(self):
         self.assertEqual('''
 
 if (a > 2):2
 elif (a > 5):5
 else:1
 ''', self.parse('$[a>2;2;a>5;5;1]'))
+
+    def test_if_elif_4(self):
+        self.assertEqual('''
+
+if (a > 2):2
+elif (a > 5):5
+''', self.parse('$[a>2;2;a>5;5;]'))
 
     def test_cast(self):
         self.assertEqual('\ndate(datetime.datetime(2000, 1, 1, 7, 0))\n', self.parse('`date$0p'))
