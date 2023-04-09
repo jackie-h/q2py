@@ -57,16 +57,16 @@ class TestQ2Py(unittest.TestCase):
         self.assertEqual('\nnumpy.array()\n', self.parse('()'))
 
     def test_op_add(self):
-        self.assertEqual('\n(2 + 1)\n', self.parse('1+2'))
+        self.assertEqual('\n(1 + 2)\n', self.parse('1+2'))
 
     #    def test_op_subtract(self):
     #        self.assertEqual(self.parse('1-2'), '(2 - 1)\n')
 
     def test_op_multiply(self):
-        self.assertEqual('\n(2 * 1)\n', self.parse('1*2'))
+        self.assertEqual('\n(1 * 2)\n', self.parse('1*2'))
 
     def test_op_divide(self):
-        self.assertEqual('\n(2 / 1)\n', self.parse('1%2'))
+        self.assertEqual('\n(1 / 2)\n', self.parse('1%2'))
 
     def test_op_and(self):
         self.assertEqual('\n(2 and 1)\n', self.parse('1&2'))
@@ -96,7 +96,7 @@ class TestQ2Py(unittest.TestCase):
         self.assertEqual('\n(1 == \'2\')\n', self.parse('1~"2"'))
 
     def test_op_join(self):
-        self.assertEqual('\n(\'de\' + \'abc\')\n', self.parse('"abc", "de"'))
+        self.assertEqual('\n(\'abc\' + \'de\')\n', self.parse('"abc", "de"'))
 
     def test_op_each_join(self):
         self.assertEqual("\nnumpy.add(numpy.array('de', 'xyz'), numpy.array('abc', 'uv'))\n",
@@ -179,14 +179,14 @@ elif (a > 5):5
         self.assertEqual('''
 
 def f():
-    (x + 2)
+    (2 + x)
 ''', self.parse('f:{2+x}'))
 
     def test_function_def_with_args(self):
         self.assertEqual('''
 
 def f(a, b, c):
-    (((c * 2) + b) + a)
+    (a + (b + (2 * c)))
 ''', self.parse('f:{[a;b;c] a+b+2*c}'))
 
     def test_function_def_multiline(self):
@@ -194,7 +194,7 @@ def f(a, b, c):
 
 def f():
     
-    y = (x + 2)
+    y = (2 + x)
     y
 ''', self.parse('f:{y:2+x;y}'))
 
@@ -218,7 +218,7 @@ import unittest
 class TestExample(unittest.TestCase):
 
     def test_add(self):
-        self.assertEqual(3, (2 + 1), '1+2 should equal 3')
+        self.assertEqual(3, (1 + 2), '1+2 should equal 3')
 
     def test_subtract(self):
         self.assertEqual(1, -1, 2, '2-1 should equal 1')
