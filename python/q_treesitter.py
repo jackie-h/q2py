@@ -394,8 +394,12 @@ def convert_if(node: Node, tail, out: deque, named: dict):
             arg1 = vals.pop()
             vals.append(If(arg1, [arg2], [arg3]))
         out.append(vals.pop())
+    elif len(vals) == 2:
+        arg2 = vals.pop()
+        arg1 = vals.pop()
+        out.append(If(arg1,[arg2],[]))
     else:
-        error('Unsupported if', out)
+        error('Unsupported if ' + str(len(vals)), out)
 
 def convert_cast(node: Node, tail, out: deque, named: dict):
     assert node.child_count == 2

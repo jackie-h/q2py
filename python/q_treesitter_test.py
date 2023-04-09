@@ -141,6 +141,13 @@ else:
     r = 'true'
 ''', self.parse('if[a > 10;a:20;r: "true"]'))
 
+    def test_if_no_else(self):
+        self.assertEqual('''
+
+if (a > 10):
+    a = 20
+''', self.parse('if[a > 10;a:20;]'))
+
     def test_if_elif(self):
         self.assertEqual('''
 
