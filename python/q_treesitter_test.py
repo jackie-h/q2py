@@ -208,6 +208,9 @@ j.j
     def test_sql_select(self):
         self.assertEqual('\n\'select a,b from t\'\n', self.parse('select a,b from t;'))
 
+    def test_fn_enlist(self):
+        self.assertEqual('\nnumpy.array(t)\n', self.parse('enlist t;'))
+
     def test_test(self):
         self.assertEqual('''
 import unittest
